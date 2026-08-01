@@ -22,6 +22,7 @@ namespace HeroDefense.Battle
         public event Action<UnitData> PlayerUnitProduced;
         public event Action<CombatUnit> UnitSpawned;
         public event Action<CombatUnit,DamageInfo,DamageResult> UnitDamageResolved;
+        public event Action BaseDamaged;
         public int ActivePlayerCount=>registry.PlayerCount;
         public int ActiveEnemyCount=>registry.EnemyCount;
         public bool IsDefeated{get;private set;}
@@ -50,7 +51,7 @@ namespace HeroDefense.Battle
             pool = new CombatPool(world, registry, effectObject.GetComponent<FloatingDamageTextPool>(),projectileObject.GetComponent<ProjectilePool>());
             if (swordsman != null) pool.Prewarm(swordsman, 5); if (slime != null) pool.Prewarm(slime, 6); if (goblin != null) pool.Prewarm(goblin, 4);
             if(poisonGoblin!=null)pool.Prewarm(poisonGoblin,2);if(shamanGoblin!=null)pool.Prewarm(shamanGoblin,2);
-            playerBase = CreateBase(world); registry.SetPlayerBase(playerBase); playerBase.Defeated += ShowDefeat;
+            playerBase = CreateBase(world); registry.SetPlayerBase(playerBase); playerBase.Defeated += ShowDefeat;playerBase.Damaged+=OnBaseDamaged;
             playerSpawn = CreateSpawnPoint(world, "PlayerSpawnPoint", Team.Player, new Vector2(-540,0));
             enemySpawn = CreateSpawnPoint(world, "EnemySpawnPoint", Team.Enemy, new Vector2(650,0));
             enemySpawnSecond = CreateSpawnPoint(world, "EnemySpawnPoint_02", Team.Enemy, new Vector2(650,115));
@@ -133,10 +134,12 @@ namespace HeroDefense.Battle
         public void MarkStageCleared(){if(IsStageEnded)return;IsVictorious=true;DefeatStateChanged?.Invoke(false);pause.SuspendForResult();}
         public void SetDefeatDetails(string details){if(defeatTitle!=null)defeatTitle.text="스테이지 실패\n"+details;}
         private void ShowDefeat() { if (defeatPanel.activeSelf||IsVictorious) return;IsDefeated=true;DefeatStateChanged?.Invoke(true); pause.SuspendForResult(); defeatPanel.SetActive(true); }
-        public void Dispose() { playerBase.Defeated -= ShowDefeat; }
+        public void ShowHealing(IAdvancedCombatant target,float amount){if(target==null||amount<=0)return;pool.DamageTexts.ShowHealing(World,target.TargetTransform.localPosition,amount);}
+        public void Dispose() { playerBase.Defeated -= ShowDefeat;playerBase.Damaged-=OnBaseDamaged; }
         private void Track(CombatUnit unit){unit.Died-=OnUnitDied;unit.Died+=OnUnitDied;unit.DamageResolved-=OnUnitDamageResolved;unit.DamageResolved+=OnUnitDamageResolved;UnitSpawned?.Invoke(unit);}
         private void Untrack(CombatUnit unit){if(unit==null)return;unit.Died-=OnUnitDied;unit.DamageResolved-=OnUnitDamageResolved;}
         private void OnUnitDamageResolved(CombatUnit target,DamageInfo info,DamageResult result)=>UnitDamageResolved?.Invoke(target,info,result);
+        private void OnBaseDamaged()=>BaseDamaged?.Invoke();
         private static UnitData Load(string name)
         {
             return RuntimeUnitCatalog.Get(name);

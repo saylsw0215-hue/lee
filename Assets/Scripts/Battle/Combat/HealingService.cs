@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace HeroDefense.Battle.Combat
@@ -6,6 +7,7 @@ namespace HeroDefense.Battle.Combat
     public readonly struct HealingResult{public readonly bool Applied;public readonly float Requested,Restored;public HealingResult(bool applied,float requested,float restored){Applied=applied;Requested=requested;Restored=restored;}}
     public static class HealingService
     {
-        public static HealingResult Apply(HealingInfo info){if(info.Target==null||!info.Target.IsAlive||info.Amount<=0)return default;float before=info.Target.Health.CurrentHealth;float amount=info.Amount*info.Target.RuntimeStats.HealingMultiplier;info.Target.Health.Heal(amount);float restored=info.Target.Health.CurrentHealth-before;return new HealingResult(restored>0,info.Amount,restored);}
+        public static event Action<HealingInfo,HealingResult> Applied;
+        public static HealingResult Apply(HealingInfo info){if(info.Target==null||!info.Target.IsAlive||info.Amount<=0)return default;float before=info.Target.Health.CurrentHealth;float amount=info.Amount*info.Target.RuntimeStats.HealingMultiplier;info.Target.Health.Heal(amount);float restored=info.Target.Health.CurrentHealth-before;var result=new HealingResult(restored>0,info.Amount,restored);if(result.Applied)Applied?.Invoke(info,result);return result;}
     }
 }

@@ -46,6 +46,7 @@ namespace HeroDefense.Battle.Combat
         }
         public void SetHealth(float current, float maximum) => healthBar.Set(current, maximum);
         public void SetStatuses(System.Collections.Generic.IReadOnlyList<StatusEffectInstance> values){if(statusLabel==null)return;statusLabel.text=values.Count==0?string.Empty:values[0].Data.DisplayName+(values[0].Stacks>1?$" x{values[0].Stacks}":string.Empty);statusLabel.color=values.Count==0?Color.white:values[0].Data.Color;}
+        public void SetDeathProgress(float progress){if(body==null)return;Color color=baseColor;color.a=1f-Mathf.Clamp01(progress);body.color=color;bodyRect.localRotation=Quaternion.Euler(0,0,Mathf.Lerp(0,-12f*facing,progress));}
         private void LateUpdate()
         {
             if(bodyRect==null||feedback!=null)return;Vector3 current=transform.localPosition;float dx=current.x-lastPosition.x;float speed=(current-lastPosition).sqrMagnitude/Mathf.Max(.0001f,Time.deltaTime*Time.deltaTime);bool moving=speed>4f;if(Mathf.Abs(dx)>.05f)facing=dx>0?1:-1;walkBlend=Mathf.MoveTowards(walkBlend,moving?1:0,Time.deltaTime*8f);float phase=Time.time*9f;float bob=(moving?Mathf.Abs(Mathf.Sin(phase))*5f:Mathf.Sin(Time.time*2.4f)*1.5f);float tilt=moving?Mathf.Sin(phase)*3.8f:Mathf.Sin(Time.time*1.8f)*.8f;bodyRect.anchoredPosition=new Vector2(0,bob);bodyRect.localRotation=Quaternion.Euler(0,0,-tilt*facing);bodyRect.localScale=new Vector3(facing*(1f+walkBlend*.025f),1f-walkBlend*.025f,1);lastPosition=current;

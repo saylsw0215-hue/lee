@@ -16,6 +16,7 @@ namespace HeroDefense.Battle
         private readonly Dictionary<string, Queue<CombatUnit>> queues = new();
         private readonly List<CombatUnit> active = new(40);
         public IReadOnlyList<CombatUnit> Active => active;
+        public FloatingDamageTextPool DamageTexts=>texts;
 
         public CombatPool(Transform parent, CombatRegistry registry, FloatingDamageTextPool texts,ProjectilePool projectilePool=null)
         { this.parent = parent; this.registry = registry; this.texts = texts;projectiles=projectilePool; }

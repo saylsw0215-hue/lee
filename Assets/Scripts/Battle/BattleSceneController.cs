@@ -13,6 +13,7 @@ using HeroDefense.Save;
 using HeroDefense.Meta;
 using HeroDefense.Battle.Economy;
 using HeroDefense.Battle.Effects;
+using HeroDefense.Battle.Combat;
 using HeroDefense.Audio;
 using HeroDefense.Build;
 
@@ -63,6 +64,7 @@ namespace HeroDefense.Battle
             combat = new BattleCombatController(safe, combatWorld, state, pause, buildingModel);
             var mineObject=new GameObject("ContestedGoldMine",typeof(RectTransform),typeof(GoldMineController));goldMine=mineObject.GetComponent<GoldMineController>();goldMine.Initialize(combatWorld,state,pause,combat.Registry,()=>combat.IsStageEnded);combat.BattleReset+=goldMine.ResetMine;
             screenShake=gameObject.AddComponent<ScreenShakeController>();screenShake.Initialize(combatWorld);
+            combat.BaseDamaged+=OnBaseDamaged;HealingService.Applied+=OnHealing;
             buildingSystem = new BuildingSystemController(safe,combatWorld,buildingRow,selectionStatus,state,pause,combat);
             var waveObject=new GameObject("WaveManager",typeof(WaveManager));waveObject.transform.SetParent(transform,false);waveManager=waveObject.GetComponent<WaveManager>();waveManager.Initialize(safe,state,pause,combat);
             waveManager.BossWaveStarted+=OnBossWave;
@@ -113,6 +115,8 @@ namespace HeroDefense.Battle
         private void OnApplicationFocus(bool focused){if(focused)return;heroManager?.Aiming?.Cancel();if(pause!=null&&combat!=null&&!combat.IsStageEnded&&!pause.IsPaused)pause.Pause();}
         private void OnPauseChanged(bool value) => pausePanel.SetActive(value&&!pause.HasReason(GamePauseReason.LevelUpSelection));
         private void OnBossWave(int wave){screenShake?.Play(.45f,14);Haptics.Current.Pulse();}
+        private void OnBaseDamaged()=>screenShake?.Play(.22f,6f);
+        private void OnHealing(HealingInfo info,HealingResult result){if(combat==null||info.Target==null||!info.Target.TargetTransform.IsChildOf(combat.World))return;combat.ShowHealing(info.Target,result.Restored);}
         private void OnDestroy()
         {
             Time.timeScale = 1f;
@@ -122,6 +126,7 @@ namespace HeroDefense.Battle
             if(heroManager!=null&&waveManager!=null){waveManager.StageWon-=heroManager.OnVictory;waveManager.StageFailed-=heroManager.OnDefeat;}
             if(waveManager!=null)waveManager.BossWaveStarted-=OnBossWave;
             if(combat!=null&&goldMine!=null)combat.BattleReset-=goldMine.ResetMine;
+            if(combat!=null)combat.BaseDamaged-=OnBaseDamaged;HealingService.Applied-=OnHealing;
             hud?.Dispose(); buildings?.Dispose(); buildingSystem?.Dispose(); combat?.Dispose();
             debugGold?.Dispose(); debugWave?.Dispose(); debugDamage?.Dispose();
         }

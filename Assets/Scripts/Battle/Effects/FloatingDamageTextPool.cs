@@ -23,6 +23,15 @@ namespace HeroDefense.Battle.Effects
             string prefix=critical?"CRIT ":type==Combat.DamageType.Magical?"MAGIC ":type==Combat.DamageType.True?"TRUE ":"";label.text=$"{prefix}-{Mathf.RoundToInt(amount)}";label.color=critical?new Color(1f,.4f,.1f):type==Combat.DamageType.Magical?new Color(.65f,.45f,1f):new Color(1f,.92f,.42f);label.fontSize=critical?36:28;label.gameObject.SetActive(true);
             StartCoroutine(Animate(label));
         }
+        public void ShowResolved(Transform parent,Vector3 localPosition,Combat.DamageResult result,Combat.DamageType type)
+        {
+            if(result.WasDodged){ShowText(parent,localPosition,"DODGE",new Color(.7f,.9f,1f),34);return;}
+            if(result.ShieldAbsorbed>0&&result.HealthDamage<=0){ShowText(parent,localPosition,$"SHIELD {Mathf.RoundToInt(result.ShieldAbsorbed)}",new Color(.3f,.8f,1f),25);return;}
+            if(result.ShieldAbsorbed>0){ShowText(parent,localPosition,$"SHIELD {Mathf.RoundToInt(result.ShieldAbsorbed)}  -{Mathf.RoundToInt(result.HealthDamage)}",new Color(.38f,.82f,1f),25);return;}
+            if(result.RawDamage-result.MitigatedDamage>1f&&!result.WasCritical){ShowText(parent,localPosition,$"GUARD -{Mathf.RoundToInt(result.HealthDamage)}",new Color(.72f,.84f,.95f),25);return;}
+            if(result.WasApplied)ShowAdvanced(parent,localPosition,result.HealthDamage,result.WasCritical,type);
+        }
+        public void ShowHealing(Transform parent,Vector3 localPosition,float amount){if(amount>0)ShowText(parent,localPosition,$"+{Mathf.RoundToInt(amount)}",new Color(.35f,1f,.56f),29);}
         public void ShowText(Transform parent,Vector3 localPosition,string value,Color color,int size=28){if(SaveGameManager.Instance!=null&&!SaveGameManager.Instance.Data.settings.damageNumbers)return;Text label=Acquire(parent);if(label==null)return;label.transform.SetParent(parent,false);label.transform.localPosition=localPosition+new Vector3(0,55);label.text=value;label.color=color;label.fontSize=size;label.gameObject.SetActive(true);StartCoroutine(Animate(label));}
         private Text Acquire(Transform parent){int maximum=SaveGameManager.Instance?.Data.settings.graphicsQuality==GraphicsQualityOption.Low?24:48;Text label;if(available.Count>0)label=available.Dequeue();else{if(created>=maximum)return null;created++;label=Create(parent);}active++;activeLabels.Add(label);return label;}
         private Text Create(Transform parent)

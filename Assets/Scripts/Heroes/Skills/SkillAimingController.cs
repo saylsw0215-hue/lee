@@ -16,7 +16,7 @@ namespace HeroDefense.Heroes.Skills
         public void Initialize(RectTransform safe,RectTransform battleWorld,HeroController controller)
         {
             hero=controller;world=battleWorld;overlay=UiFactory.Panel(safe,"SkillAimOverlay",new Color(0,0,0,.12f),Vector2.zero,Vector2.one).gameObject;overlayRect=overlay.GetComponent<RectTransform>();overlay.AddComponent<SkillAimRaycaster>().Owner=this;
-            preview=UiFactory.Panel(overlay.transform,"SkillAimPreview",new Color(.2f,.8f,1f,.28f),new Vector2(.5f,.5f),new Vector2(.5f,.5f));preview.pivot=new Vector2(.5f,.5f);
+            preview=UiFactory.Panel(overlay.transform,"SkillAimPreview",new Color(.2f,.8f,1f,.28f),new Vector2(.5f,.5f),new Vector2(.5f,.5f));preview.pivot=new Vector2(.5f,.5f);var outline=preview.gameObject.AddComponent<Outline>();outline.effectColor=new Color(.65f,1f,1f,.95f);outline.effectDistance=new Vector2(3,-3);outline.useGraphicAlpha=false;
             hint=UiFactory.Label(overlay.transform,"AimHint","전장을 터치해 발동",28,TextAnchor.MiddleCenter,Color.white);hint.rectTransform.anchorMin=new Vector2(.3f,.88f);hint.rectTransform.anchorMax=new Vector2(.7f,.97f);hint.rectTransform.offsetMin=hint.rectTransform.offsetMax=Vector2.zero;
             Button cancel=UiFactory.Button(overlay.transform,"CancelAim","조준 취소",new Color(.55f,.16f,.16f));var cr=cancel.GetComponent<RectTransform>();cr.anchorMin=new Vector2(.8f,.05f);cr.anchorMax=new Vector2(.97f,.16f);cr.offsetMin=cr.offsetMax=Vector2.zero;cancel.onClick.AddListener(Cancel);overlay.SetActive(false);
         }
