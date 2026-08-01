@@ -4,6 +4,7 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 /Builds/
+/Data/
 *.csproj
 *.sln
 *.user
