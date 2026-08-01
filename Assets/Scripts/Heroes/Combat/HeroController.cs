@@ -7,6 +7,7 @@ using HeroDefense.Battle.Effects;
 using HeroDefense.Battle.Statistics;
 using HeroDefense.Heroes.Skills;
 using UnityEngine;
+using HeroDefense.Audio;
 using UnityEngine.UI;
 using HeroDefense.Meta;
 
@@ -46,20 +47,20 @@ namespace HeroDefense.Heroes
         {
             if(attackCooldown>0||target==null||!target.IsAlive)return;attackCooldown=Data.AttackInterval/((1+attackSpeedBonus)*RuntimeStats.AttackSpeedMultiplier*Statuses.AttackSpeedMultiplier);float damage=Data.AttackDamage*RuntimeStats.AttackPowerMultiplier*MetaRuntimeModifierProvider.HeroAttackMultiplier;
             if(Data.Passive.Kind==HeroPassiveKind.ConsecutiveShot){if(previousTarget==target)consecutiveHits++;else{previousTarget=target;consecutiveHits=1;}if(consecutiveHits%3==0)damage*=1.5f;}
-            visualAttackKick=.16f;DealDamage(target,damage,true);effects.Show(transform.localPosition,70,Color.Lerp(Data.PlaceholderColor,Color.white,.3f),.2f);ShowEmotion(true);
+            visualAttackKick=.16f;AudioManager.Instance?.PlayEvent(GameAudioEvent.BasicAttack);DealDamage(target,damage,true);effects.Show(transform.localPosition,70,Color.Lerp(Data.PlaceholderColor,Color.white,.3f),.2f);ShowEmotion(true);
             if(Data.Passive.Kind==HeroPassiveKind.Ember){ApplyStatusTo(target,RuntimeStatusCatalog.Get("Burn"),Data.AttackDamage*.1f);if(++emberHits%5==0)DamageArea(target.TargetTransform.localPosition,1.5f,Data.AttackDamage*.4f,6,target);}
             if(pierce)DamageArea(target.TargetTransform.localPosition,2.2f,damage,1,target);
         }
         public bool UseActiveSkill()
         {
-            if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseSkill||registry.EnemyCount==0)return false;if(!Runtime.BeginSkill(Data.ActiveSkill.Cooldown))return false;if(!executor.ExecuteActive(this)){Runtime.FinishCast();return false;}statistics.RecordHeroSkillUse();StartCoroutine(FinishCast(Data.ActiveSkill.CastTime));ResourcesChanged?.Invoke();return true;
+            if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseSkill||registry.EnemyCount==0)return false;if(!Runtime.BeginSkill(Data.ActiveSkill.Cooldown))return false;if(!executor.ExecuteActive(this)){Runtime.FinishCast();return false;}AudioManager.Instance?.PlayEvent(GameAudioEvent.HeroSkill);statistics.RecordHeroSkillUse();StartCoroutine(FinishCast(Data.ActiveSkill.CastTime));ResourcesChanged?.Invoke();return true;
         }
-        public bool UseActiveSkillAt(Vector3 point){if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseSkill||registry.EnemyCount==0)return false;if(!Runtime.BeginSkill(Data.ActiveSkill.Cooldown))return false;if(!executor.ExecuteActiveAt(this,ClampSkillPoint(point,Data.ActiveSkill.Range))){Runtime.FinishCast();return false;}statistics.RecordHeroSkillUse();StartCoroutine(FinishCast(Data.ActiveSkill.CastTime));ResourcesChanged?.Invoke();return true;}
+        public bool UseActiveSkillAt(Vector3 point){if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseSkill||registry.EnemyCount==0)return false;if(!Runtime.BeginSkill(Data.ActiveSkill.Cooldown))return false;if(!executor.ExecuteActiveAt(this,ClampSkillPoint(point,Data.ActiveSkill.Range))){Runtime.FinishCast();return false;}AudioManager.Instance?.PlayEvent(GameAudioEvent.HeroSkill);statistics.RecordHeroSkillUse();StartCoroutine(FinishCast(Data.ActiveSkill.CastTime));ResourcesChanged?.Invoke();return true;}
         public bool UseUltimate()
         {
-            if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseUltimate||registry.EnemyCount==0)return false;if(!Runtime.BeginUltimate())return false;if(!executor.ExecuteUltimate(this)){Runtime.AddEnergy(100);Runtime.FinishCast();return false;}statistics.RecordHeroUltimateUse();StartCoroutine(FinishCast(Data.UltimateSkill.CastTime));ResourcesChanged?.Invoke();return true;
+            if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseUltimate||registry.EnemyCount==0)return false;if(!Runtime.BeginUltimate())return false;if(!executor.ExecuteUltimate(this)){Runtime.AddEnergy(100);Runtime.FinishCast();return false;}AudioManager.Instance?.PlayEvent(GameAudioEvent.HeroUltimate);statistics.RecordHeroUltimateUse();StartCoroutine(FinishCast(Data.UltimateSkill.CastTime));ResourcesChanged?.Invoke();return true;
         }
-        public bool UseUltimateAt(Vector3 point){if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseUltimate||registry.EnemyCount==0)return false;if(!Runtime.BeginUltimate())return false;if(!executor.ExecuteUltimateAt(this,ClampSkillPoint(point,Data.UltimateSkill.Range))){Runtime.AddEnergy(100);Runtime.FinishCast();return false;}statistics.RecordHeroUltimateUse();StartCoroutine(FinishCast(Data.UltimateSkill.CastTime));ResourcesChanged?.Invoke();return true;}
+        public bool UseUltimateAt(Vector3 point){if(pause.IsPaused||combat.IsStageEnded||Statuses.IsSilenced||!Runtime.CanUseUltimate||registry.EnemyCount==0)return false;if(!Runtime.BeginUltimate())return false;if(!executor.ExecuteUltimateAt(this,ClampSkillPoint(point,Data.UltimateSkill.Range))){Runtime.AddEnergy(100);Runtime.FinishCast();return false;}AudioManager.Instance?.PlayEvent(GameAudioEvent.HeroUltimate);statistics.RecordHeroUltimateUse();StartCoroutine(FinishCast(Data.UltimateSkill.CastTime));ResourcesChanged?.Invoke();return true;}
         public Vector3 ClampSkillPoint(Vector3 point,float range){Vector3 delta=point-transform.localPosition;float max=range*CombatUnit.PixelsPerUnit;return max>0&&delta.sqrMagnitude>max*max?transform.localPosition+delta.normalized*max:point;}
         private IEnumerator FinishCast(float duration){yield return new WaitForSeconds(Mathf.Max(.05f,duration));Runtime.FinishCast();StateChanged?.Invoke();}
         public void TakeDamage(DamageInfo info)=>ApplyAdvancedDamage(info);
