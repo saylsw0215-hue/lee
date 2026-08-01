@@ -24,96 +24,109 @@ permissions:
 
 env:
   UNITY_VERSION: 6000.5.6f1
+  UNITY_BIN: /Applications/Unity/Hub/Editor/6000.5.6f1/Unity.app/Contents/MacOS/Unity
 
 jobs:
   tests:
     name: EditMode and PlayMode tests
-    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, macOS, ARM64, hero-defense, unity-6000.5.6f1]
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v4
         with:
-          path: Library
-          key: Library-${{ runner.os }}-${{ hashFiles('Packages/**', 'ProjectSettings/**') }}
-          restore-keys: Library-${{ runner.os }}-
-      - name: Verify Unity license configuration
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        shell: bash
-        run: |
-          if [[ -z "${UNITY_LICENSE}" && ( -z "${UNITY_EMAIL}" || -z "${UNITY_PASSWORD}" ) ]]; then
-            echo "::error title=Unity license is not configured::Set UNITY_LICENSE, or both UNITY_EMAIL and UNITY_PASSWORD, in repository Actions secrets. Tests cannot run without a valid Unity activation."
-            exit 1
-          fi
-      - name: Run Unity tests
-        uses: game-ci/unity-test-runner@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          testMode: all
-          artifactsPath: test-results
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-      - name: Collect Unity test logs
-        if: always()
-        shell: bash
-        run: |
-          mkdir -p test-artifacts/logs
-          find . -type f \( -name '*.log' -o -name 'TestResults*.xml' -o -name '*.xml' \) \
-            -not -path './Library/*' -not -path './.git/*' \
-            -exec cp --parents '{}' test-artifacts/logs/ \; 2>/dev/null || true
-          if [[ -d test-results ]]; then
-            cp -R test-results test-artifacts/results
-          fi
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: unity-test-results
-          path: test-artifacts
-          if-no-files-found: warn
-
-  webgl:
-    name: WebGL and GitHub Pages
-    needs: tests
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && (inputs.build_target == 'webgl' || inputs.build_target == 'all'))
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: Library
-          key: Library-WebGL-${{ hashFiles('Packages/**', 'ProjectSettings/**') }}
-          restore-keys: Library-WebGL-
-      - name: Build WebGL
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: WebGL
-          buildsPath: build
-          buildName: HeroDefense
-          versioning: None
-      - name: Prepare Pages artifact
+          clean: true
+      - name: Verify Unity installation and license
         shell: bash
         run: |
           set -euo pipefail
-          index_file="$(find build -name index.html -print -quit)"
-          test -n "$index_file"
+          if [[ ! -x "$UNITY_BIN" ]]; then
+            echo "::error title=Unity is not installed::Expected Unity $UNITY_VERSION at $UNITY_BIN"
+            exit 1
+          fi
+          actual_version="$($UNITY_BIN -version)"
+          if [[ "$actual_version" != "$UNITY_VERSION" ]]; then
+            echo "::error title=Unity version mismatch::Expected $UNITY_VERSION but found $actual_version"
+            exit 1
+          fi
+          echo "Using Unity $actual_version with the MacBook's activated Unity entitlement."
+      - name: Run project EditMode tests
+        id: editmode
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p test-results
+          "$UNITY_BIN" -batchmode -nographics -projectPath "$GITHUB_WORKSPACE" \
+            -runTests -testPlatform editmode -assemblyNames HeroDefense.EditModeTests \
+            -testResults "$GITHUB_WORKSPACE/test-results/editmode.xml" \
+            -logFile "$GITHUB_WORKSPACE/test-results/editmode.log"
+      - name: Run project PlayMode tests
+        id: playmode
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p test-results
+          "$UNITY_BIN" -batchmode -nographics -projectPath "$GITHUB_WORKSPACE" \
+            -runTests -testPlatform playmode -assemblyNames HeroDefense.PlayModeTests \
+            -testResults "$GITHUB_WORKSPACE/test-results/playmode.xml" \
+            -logFile "$GITHUB_WORKSPACE/test-results/playmode.log"
+      - name: Upload Unity test results and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-test-results-${{ github.run_id }}
+          path: test-results
+          if-no-files-found: error
+      - name: Fail when Unity tests fail
+        if: always()
+        shell: bash
+        env:
+          EDIT_OUTCOME: ${{ steps.editmode.outcome }}
+          PLAY_OUTCOME: ${{ steps.playmode.outcome }}
+        run: |
+          if [[ "$EDIT_OUTCOME" != "success" || "$PLAY_OUTCOME" != "success" ]]; then
+            echo "::error title=Unity tests failed::EditMode=$EDIT_OUTCOME, PlayMode=$PLAY_OUTCOME. Download the unity-test-results artifact for XML results and full Editor logs."
+            exit 1
+          fi
+
+  webgl:
+    name: WebGL build
+    needs: tests
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && (inputs.build_target == 'webgl' || inputs.build_target == 'all'))
+    runs-on: [self-hosted, macOS, ARM64, hero-defense, unity-6000.5.6f1]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+      - name: Build WebGL
+        shell: bash
+        run: |
+          mkdir -p Builds/Logs
+          "$UNITY_BIN" -batchmode -nographics -quit -projectPath "$GITHUB_WORKSPACE" \
+            -executeMethod HeroDefense.Editor.BuildAutomation.BuildWebGL \
+            -logFile "$GITHUB_WORKSPACE/Builds/Logs/webgl-ci.log"
+          test -f Builds/WebGL/index.html
+      - name: Upload WebGL build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HeroDefense-WebGL-log-${{ github.run_id }}
+          path: Builds/Logs/webgl-ci.log
+          if-no-files-found: warn
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          rm -rf public
           mkdir -p public
-          cp -R "$(dirname "$index_file")"/. public/
+          cp -R Builds/WebGL/. public/
+          touch public/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public
       - uses: actions/upload-artifact@v4
         with:
-          name: HeroDefense-WebGL
+          name: HeroDefense-WebGL-${{ github.run_id }}
           path: public
 
   deploy-pages:
@@ -133,46 +146,44 @@ jobs:
     name: macOS app artifact
     needs: tests
     if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'macos' || inputs.build_target == 'all')
-    runs-on: macos-14
+    runs-on: [self-hosted, macOS, ARM64, hero-defense, unity-6000.5.6f1]
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Build macOS
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: StandaloneOSX
-          buildsPath: build
-          buildName: HeroDefense
-          versioning: None
+          clean: true
+      - name: Build macOS
+        shell: bash
+        run: |
+          mkdir -p Builds/Logs
+          "$UNITY_BIN" -batchmode -nographics -quit -projectPath "$GITHUB_WORKSPACE" \
+            -executeMethod HeroDefense.Editor.BuildAutomation.BuildMacOS \
+            -logFile "$GITHUB_WORKSPACE/Builds/Logs/macos-ci.log"
+          test -d Builds/macOS/HeroDefense.app
       - uses: actions/upload-artifact@v4
         with:
-          name: HeroDefense-macOS
-          path: build
+          name: HeroDefense-macOS-${{ github.run_id }}
+          path: Builds/macOS/HeroDefense.app
 
   ios:
     name: iOS Xcode project artifact
     needs: tests
     if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'ios' || inputs.build_target == 'all')
-    runs-on: macos-14
+    runs-on: [self-hosted, macOS, ARM64, hero-defense, unity-6000.5.6f1]
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - name: Build iOS Xcode project
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: iOS
-          buildsPath: build
-          buildName: HeroDefenseXcode
-          versioning: None
+          clean: true
+      - name: Build iOS Xcode project
+        shell: bash
+        run: |
+          mkdir -p Builds/Logs
+          "$UNITY_BIN" -batchmode -nographics -quit -projectPath "$GITHUB_WORKSPACE" \
+            -executeMethod HeroDefense.Editor.BuildAutomation.BuildIOS \
+            -logFile "$GITHUB_WORKSPACE/Builds/Logs/ios-ci.log"
+          test -d Builds/iOS/HeroDefenseXcode/Unity-iPhone.xcodeproj
       - uses: actions/upload-artifact@v4
         with:
-          name: HeroDefense-iOS-Xcode
-          path: build
+          name: HeroDefense-iOS-Xcode-${{ github.run_id }}
+          path: Builds/iOS/HeroDefenseXcode
