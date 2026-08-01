@@ -10,5 +10,6 @@ namespace HeroDefense.Heroes.Selection
         public void Select(HeroData data){SelectedHero=data;EnsureDefault();}
         public HeroData GetSelectedOrDefault(){EnsureDefault();return SelectedHero;}
         private void EnsureDefault(){if(SelectedHero==null)SelectedHero=RuntimeHeroCatalog.GetDefault();}
+        private void OnDestroy(){if(Instance==this)Instance=null;}
     }
 }

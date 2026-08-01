@@ -34,5 +34,10 @@ namespace HeroDefense.Core
             while (!operation.isDone) yield return null;
             IsLoading = false;
         }
+
+        private void OnDestroy()
+        {
+            if(Instance==this)Instance=null;
+        }
     }
 }
