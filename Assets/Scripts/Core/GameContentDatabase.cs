@@ -140,6 +140,7 @@ namespace HeroDefense.Core
                 if(stage.StartingGold<0)return Fail($"Stage '{stageId}'.StartingGold cannot be negative.",out reason);
                 if(stage.BaseMaxHealth<=0)return Fail($"Stage '{stageId}'.BaseMaxHealth must be greater than zero.",out reason);
                 if(stage.VictoryReward<0)return Fail($"Stage '{stageId}'.VictoryReward cannot be negative.",out reason);
+                if(stage.EnemyHealthMultiplier<=0||stage.EnemyDamageMultiplier<=0)return Fail($"Stage '{stageId}' balance multipliers must be greater than zero.",out reason);
                 if(stage.Waves==null||stage.Waves.Length==0)return Fail($"Stage '{stageId}'.Waves: at least one wave is required.",out reason);
                 var waveIds=new HashSet<string>(StringComparer.Ordinal);
                 for(int waveIndex=0;waveIndex<stage.Waves.Length;waveIndex++)

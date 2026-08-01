@@ -29,10 +29,10 @@ namespace HeroDefense.Tests
         public IEnumerator Units_ApproachStopAndDealDamage()
         {
             CombatUnit player=pool.Spawn(sword,new Vector2(-280,0),600); CombatUnit enemy=pool.Spawn(slime,new Vector2(280,0),-600);
-            float initialDistance=Vector3.Distance(player.transform.localPosition,enemy.transform.localPosition);
+            float initialDistance=Vector3.Distance(player.transform.localPosition,enemy.transform.localPosition),initialHealth=enemy.Health.CurrentHealth;
             for(int i=0;i<30;i++){ player.Simulate(.1f); enemy.Simulate(.1f); }
             Assert.Less(Vector3.Distance(player.transform.localPosition,enemy.transform.localPosition),initialDistance);
-            Assert.Less(enemy.GetComponent<HealthComponent>().CurrentHealth,slime.MaxHealth);
+            Assert.Less(enemy.GetComponent<HealthComponent>().CurrentHealth,initialHealth);
             yield return null;
         }
 

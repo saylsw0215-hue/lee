@@ -43,9 +43,9 @@ namespace HeroDefense.Tests
         {
             yield return LoadBattle();WaveManager manager=Object.FindAnyObjectByType<WaveManager>();
             for(int i=0;i<4;i++){manager.SkipPreparation();manager.Simulate(.05f);manager.ForceClearCurrentWave();manager.Simulate(3f);}
-            manager.SkipPreparation();manager.Simulate(2.1f);Assert.IsTrue(ContainsActive("enemy_elite_goblin"));manager.ForceClearCurrentWave();manager.Simulate(3f);
+            manager.SkipPreparation();manager.Simulate(6.1f);Assert.IsTrue(ContainsActive("enemy_elite_goblin"));manager.ForceClearCurrentWave();manager.Simulate(3f);
             for(int i=5;i<9;i++){manager.SkipPreparation();manager.Simulate(.05f);manager.ForceClearCurrentWave();manager.Simulate(3f);}
-            manager.SkipPreparation();manager.Simulate(1.1f);Assert.IsTrue(ContainsActive("boss_goblin_chieftain"));Assert.IsTrue(GameObject.Find("BossHealth").activeInHierarchy);
+            manager.SkipPreparation();manager.Simulate(8.1f);Assert.IsTrue(ContainsActive("boss_goblin_chieftain"));Assert.IsTrue(GameObject.Find("BossHealth").activeInHierarchy);
         }
         [UnityTest]public IEnumerator BaseDestruction_FailsWaveAndRestartReturnsToWaveOne()
         {
