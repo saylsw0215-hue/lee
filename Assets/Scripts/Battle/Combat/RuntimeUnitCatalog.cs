@@ -11,9 +11,6 @@ namespace HeroDefense.Battle.Combat
         public static UnitData[] GetAll(){var result=new UnitData[Names.Length];for(int i=0;i<Names.Length;i++)result[i]=Get(Names[i]);return result;}
         public static UnitData Get(string name)
         {
-#if UNITY_EDITOR
-            UnitData authored=Resources.Load<UnitData>("UnitData/"+name);if(authored!=null)return authored;
-#endif
             if(Items.TryGetValue(name,out UnitData existing))return existing;
             UnitData data=name switch
             {

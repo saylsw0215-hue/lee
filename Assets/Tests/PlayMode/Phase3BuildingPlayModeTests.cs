@@ -12,7 +12,7 @@ namespace HeroDefense.Tests
     public sealed class Phase3BuildingPlayModeTests
     {
         private GameObject root; private UnitData sword; private readonly System.Collections.Generic.List<Object> temporary=new();
-        [SetUp] public void Setup(){root=new GameObject("Phase3TestRoot",typeof(RectTransform));sword=Resources.Load<UnitData>("UnitData/PlayerSwordsman");}
+        [SetUp] public void Setup(){root=new GameObject("Phase3TestRoot",typeof(RectTransform));sword=RuntimeUnitCatalog.Get("PlayerSwordsman");}
         [TearDown] public void Teardown(){Time.timeScale=1f;Object.DestroyImmediate(root);for(int i=0;i<temporary.Count;i++)Object.DestroyImmediate(temporary[i]);temporary.Clear();}
 
         [UnityTest] public IEnumerator Building_AutomaticallyProducesAfterConstruction()
@@ -33,7 +33,7 @@ namespace HeroDefense.Tests
         }
         [UnityTest] public IEnumerator ArcherAndMage_DataRemainCompatibleWithProduction()
         {
-            UnitData archer=Resources.Load<UnitData>("UnitData/PlayerArcher"),mage=Resources.Load<UnitData>("UnitData/PlayerMage");Assert.AreEqual(Team.Player,archer.Team);Assert.AreEqual(Team.Player,mage.Team);Assert.Greater(archer.AttackRange,sword.AttackRange);Assert.Greater(mage.AttackDamage,archer.AttackDamage);yield return null;
+            UnitData archer=RuntimeUnitCatalog.Get("PlayerArcher"),mage=RuntimeUnitCatalog.Get("PlayerMage");Assert.AreEqual(Team.Player,archer.Team);Assert.AreEqual(Team.Player,mage.Team);Assert.Greater(archer.AttackRange,sword.AttackRange);Assert.Greater(mage.AttackDamage,archer.AttackDamage);yield return null;
         }
         [UnityTest] public IEnumerator EightBuildings_ProduceIndependently()
         {

@@ -16,16 +16,19 @@ namespace HeroDefense.Core
         private static Dictionary<string,UnitData> units;
         private static Dictionary<string,BuildingData> buildings;
         private static Dictionary<string,StageData> stages;
+        private static Dictionary<string,StatusEffectData> statuses;
 
         public static IReadOnlyCollection<HeroData> Heroes { get { Ensure(); return heroes.Values; } }
         public static IReadOnlyCollection<UnitData> Units { get { Ensure(); return units.Values; } }
         public static IReadOnlyCollection<BuildingData> Buildings { get { Ensure(); return buildings.Values; } }
         public static IReadOnlyCollection<StageData> Stages { get { Ensure(); return stages.Values; } }
+        public static IReadOnlyCollection<StatusEffectData> Statuses { get { Ensure(); return statuses.Values; } }
 
         public static HeroData Hero(string id) { Ensure(); return id != null && heroes.TryGetValue(id,out var value) ? value : null; }
         public static UnitData Unit(string id) { Ensure(); return id != null && units.TryGetValue(id,out var value) ? value : null; }
         public static BuildingData Building(string id) { Ensure(); return id != null && buildings.TryGetValue(id,out var value) ? value : null; }
         public static StageData Stage(string id) { Ensure(); return id != null && stages.TryGetValue(id,out var value) ? value : null; }
+        public static StatusEffectData Status(string id) { Ensure(); return id != null && statuses.TryGetValue(id,out var value) ? value : null; }
 
         public static void Rebuild()
         {
@@ -33,9 +36,10 @@ namespace HeroDefense.Core
             UnitData[] unitValues=RuntimeUnitCatalog.GetAll();
             BuildingData[] buildingValues=RuntimeBuildingCatalog.GetAll();
             StageData[] stageValues=RuntimeStageCatalog.GetAll();
-            if(!ValidateCatalogs(heroValues,unitValues,buildingValues,stageValues,out string reason))
+            StatusEffectData[] statusValues=RuntimeStatusCatalog.GetAll();
+            if(!ValidateCatalogs(heroValues,unitValues,buildingValues,stageValues,statusValues,out string reason))
                 throw new InvalidOperationException(reason);
-            BuildMaps(heroValues,unitValues,buildingValues,stageValues);
+            BuildMaps(heroValues,unitValues,buildingValues,stageValues,statusValues);
         }
 
         public static bool Validate(out string reason)
@@ -46,8 +50,9 @@ namespace HeroDefense.Core
                 UnitData[] unitValues=RuntimeUnitCatalog.GetAll();
                 BuildingData[] buildingValues=RuntimeBuildingCatalog.GetAll();
                 StageData[] stageValues=RuntimeStageCatalog.GetAll();
-                if(!ValidateCatalogs(heroValues,unitValues,buildingValues,stageValues,out reason))return false;
-                BuildMaps(heroValues,unitValues,buildingValues,stageValues);
+                StatusEffectData[] statusValues=RuntimeStatusCatalog.GetAll();
+                if(!ValidateCatalogs(heroValues,unitValues,buildingValues,stageValues,statusValues,out reason))return false;
+                BuildMaps(heroValues,unitValues,buildingValues,stageValues,statusValues);
                 return true;
             }
             catch(Exception exception)
@@ -57,13 +62,14 @@ namespace HeroDefense.Core
             }
         }
 
-        private static bool ValidateCatalogs(HeroData[] heroValues,UnitData[] unitValues,BuildingData[] buildingValues,StageData[] stageValues,out string reason)
+        private static bool ValidateCatalogs(HeroData[] heroValues,UnitData[] unitValues,BuildingData[] buildingValues,StageData[] stageValues,StatusEffectData[] statusValues,out string reason)
         {
             var ids=new HashSet<string>(StringComparer.Ordinal);
             if(heroValues==null||heroValues.Length==0)return Fail("Hero catalog: at least one entry is required.",out reason);
             if(unitValues==null||unitValues.Length==0)return Fail("Unit catalog: at least one entry is required.",out reason);
             if(buildingValues==null||buildingValues.Length==0)return Fail("Building catalog: at least one entry is required.",out reason);
             if(stageValues==null||stageValues.Length==0)return Fail("Stage catalog: at least one entry is required.",out reason);
+            if(statusValues==null||statusValues.Length==0)return Fail("Status catalog: at least one entry is required.",out reason);
 
             for(int i=0;i<heroValues.Length;i++)
             {
@@ -87,6 +93,14 @@ namespace HeroDefense.Core
                 if(!hero.AdvancedStats.Validate(out detail))return Fail($"Hero '{id}'.AdvancedStats: {detail}",out reason);
             }
 
+            for(int i=0;i<statusValues.Length;i++)
+            {
+                StatusEffectData status=statusValues[i];
+                if(status==null)return Fail($"Status catalog[{i}]: reference is null.",out reason);
+                if(!ValidateId(ids,status.EffectId,"Status",i,out reason))return false;
+                if(!status.Validate(out string detail))return Fail($"Status '{status.EffectId}': {detail}",out reason);
+            }
+
             for(int i=0;i<unitValues.Length;i++)
             {
                 UnitData unit=unitValues[i];
@@ -97,6 +111,8 @@ namespace HeroDefense.Core
                 if(unit.AttackDamage<0)return Fail($"Unit '{unit.UnitId}'.AttackDamage cannot be negative.",out reason);
                 if(unit.RewardGold<0)return Fail($"Unit '{unit.UnitId}'.RewardGold cannot be negative.",out reason);
             }
+            var unitsById=new Dictionary<string,UnitData>(StringComparer.Ordinal);
+            for(int i=0;i<unitValues.Length;i++)unitsById.Add(unitValues[i].UnitId,unitValues[i]);
 
             for(int i=0;i<buildingValues.Length;i++)
             {
@@ -104,6 +120,7 @@ namespace HeroDefense.Core
                 if(building==null)return Fail($"Building catalog[{i}]: reference is null.",out reason);
                 if(!ValidateId(ids,building.BuildingId,"Building",i,out reason))return false;
                 if(building.ProducedUnit==null)return Fail($"Building '{building.BuildingId}'.ProducedUnit: reference is null.",out reason);
+                if(!unitsById.TryGetValue(building.ProducedUnit.UnitId,out UnitData produced)||!ReferenceEquals(produced,building.ProducedUnit))return Fail($"Building '{building.BuildingId}'.ProducedUnit '{building.ProducedUnit.UnitId}' is not the shared Unit catalog entry.",out reason);
                 if(!building.Validate(out string detail))return Fail($"Building '{building.BuildingId}': {detail}",out reason);
                 if(building.BuildCost<0)return Fail($"Building '{building.BuildingId}'.BuildCost cannot be negative.",out reason);
                 if(building.BuildingSize.x<=0||building.BuildingSize.y<=0)return Fail($"Building '{building.BuildingId}'.BuildingSize must be positive.",out reason);
@@ -140,6 +157,7 @@ namespace HeroDefense.Core
                         WaveSpawnGroup group=wave.SpawnGroups[groupIndex];
                         if(group==null)return Fail($"Wave '{wave.WaveId}'.SpawnGroups[{groupIndex}]: reference is null.",out reason);
                         if(group.EnemyData==null)return Fail($"Wave '{wave.WaveId}'.SpawnGroups[{groupIndex}].EnemyData: reference is null.",out reason);
+                        if(!unitsById.TryGetValue(group.EnemyData.UnitId,out UnitData enemy)||!ReferenceEquals(enemy,group.EnemyData))return Fail($"Wave '{wave.WaveId}'.SpawnGroups[{groupIndex}].EnemyData '{group.EnemyData.UnitId}' is not the shared Unit catalog entry.",out reason);
                         if(group.Count<1)return Fail($"Wave '{wave.WaveId}'.SpawnGroups[{groupIndex}].Count must be at least one.",out reason);
                         if(group.InitialDelay<0)return Fail($"Wave '{wave.WaveId}'.SpawnGroups[{groupIndex}].InitialDelay cannot be negative.",out reason);
                         if(group.SpawnInterval<0)return Fail($"Wave '{wave.WaveId}'.SpawnGroups[{groupIndex}].SpawnInterval cannot be negative.",out reason);
@@ -162,18 +180,20 @@ namespace HeroDefense.Core
         }
 
         private static bool Fail(string message,out string reason) { reason=message; return false; }
-        private static void Ensure() { if(heroes==null)Rebuild(); }
+        private static void Ensure() { if(heroes==null||statuses==null)Rebuild(); }
 
-        private static void BuildMaps(HeroData[] heroValues,UnitData[] unitValues,BuildingData[] buildingValues,StageData[] stageValues)
+        private static void BuildMaps(HeroData[] heroValues,UnitData[] unitValues,BuildingData[] buildingValues,StageData[] stageValues,StatusEffectData[] statusValues)
         {
             heroes=new Dictionary<string,HeroData>(StringComparer.Ordinal);
             units=new Dictionary<string,UnitData>(StringComparer.Ordinal);
             buildings=new Dictionary<string,BuildingData>(StringComparer.Ordinal);
             stages=new Dictionary<string,StageData>(StringComparer.Ordinal);
+            statuses=new Dictionary<string,StatusEffectData>(StringComparer.Ordinal);
             for(int i=0;i<heroValues.Length;i++)heroes.Add(heroValues[i].HeroId,heroValues[i]);
             for(int i=0;i<unitValues.Length;i++)units.Add(unitValues[i].UnitId,unitValues[i]);
             for(int i=0;i<buildingValues.Length;i++)buildings.Add(buildingValues[i].BuildingId,buildingValues[i]);
             for(int i=0;i<stageValues.Length;i++)stages.Add(stageValues[i].StageId,stageValues[i]);
+            for(int i=0;i<statusValues.Length;i++)statuses.Add(statusValues[i].EffectId,statusValues[i]);
         }
     }
 }

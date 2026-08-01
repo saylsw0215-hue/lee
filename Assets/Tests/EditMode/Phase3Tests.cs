@@ -10,7 +10,7 @@ namespace HeroDefense.Tests
     public sealed class Phase3Tests
     {
         private BuildingData barracks; private BattleSessionState session; private BuildingEconomyService economy;
-        [SetUp] public void Setup(){barracks=Resources.Load<BuildingData>("BuildingData/Barracks");session=new BattleSessionState();economy=new BuildingEconomyService(session);}
+        [SetUp] public void Setup(){barracks=RuntimeBuildingCatalog.Get("Barracks");session=new BattleSessionState();economy=new BuildingEconomyService(session);}
         [Test] public void BuildingCost_IsLoaded(){Assert.AreEqual(100,barracks.BuildCost);}
         [Test] public void SpendGold_SucceedsWhenAffordable(){Assert.IsTrue(session.TrySpendGold(100));Assert.AreEqual(400,session.CurrentGold);}
         [Test] public void SpendGold_FailsWhenInsufficient(){Assert.IsFalse(session.TrySpendGold(999));}

@@ -12,9 +12,6 @@ namespace HeroDefense.Battle.Buildings
         public static BuildingData[] GetAll(){var result=new BuildingData[Names.Length];for(int i=0;i<Names.Length;i++)result[i]=Get(Names[i]);return result;}
         public static BuildingData Get(string name)
         {
-#if UNITY_EDITOR
-            BuildingData authored=Resources.Load<BuildingData>("BuildingData/"+name);if(authored!=null)return authored;
-#endif
             if(Items.TryGetValue(name,out BuildingData item))return item;
             item=name switch
             {

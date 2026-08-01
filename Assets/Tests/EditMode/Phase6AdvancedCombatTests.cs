@@ -46,6 +46,6 @@ namespace HeroDefense.Tests
         [Test]public void HundredConcurrentStatusControllers_TickSafely(){var objects=new GameObject[100];for(int i=0;i<objects.Length;i++){objects[i]=new GameObject("StatusLoad"+i);var value=objects[i].AddComponent<FakeCombatant>();value.Init(Stats());value.Statuses.Apply(Status("Burn"),null,1);value.Statuses.Tick(1);}for(int i=0;i<objects.Length;i++)Object.DestroyImmediate(objects[i]);Assert.Pass();}
         private static DamageInfo Info(float amount,DamageType type,bool crit=false,bool dodge=false)=>new(amount,Team.Player,null,type,crit,dodge);
         private static CombatStats Stats(float defense=0,float magic=0,float crit=.05f,float multiplier=1.5f,float dodge=0){var value=new CombatStats();value.Configure(defense,magic,crit,multiplier,dodge,0,0,0,0,0);return value;}
-        private static StatusEffectData Status(string file)=>Resources.Load<StatusEffectData>("StatusEffects/"+file);
+        private static StatusEffectData Status(string file)=>RuntimeStatusCatalog.Get(file);
     }
 }

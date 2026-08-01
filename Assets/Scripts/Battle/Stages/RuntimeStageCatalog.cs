@@ -12,9 +12,6 @@ namespace HeroDefense.Battle.Stages
         public static StageData GetById(string id){StageData[] values=GetAll();for(int i=0;i<values.Length;i++)if(values[i].StageId==id)return values[i];return null;}
         public static StageData GetStageOne()
         {
-#if UNITY_EDITOR
-            StageData authored=Resources.Load<StageData>("StageData/Stage01Grassland");if(authored!=null)return authored;
-#endif
             if(stage!=null)return stage;
             UnitData slime=RuntimeUnitCatalog.Get("EnemySlime"),goblin=RuntimeUnitCatalog.Get("EnemyGoblin"),eliteSlime=RuntimeUnitCatalog.Get("EnemyEliteSlime"),eliteGoblin=RuntimeUnitCatalog.Get("EnemyEliteGoblin"),boss=RuntimeUnitCatalog.Get("BossGoblinChieftain");
             WaveData[] waves=

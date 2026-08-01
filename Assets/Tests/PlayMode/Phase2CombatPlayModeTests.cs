@@ -21,7 +21,7 @@ namespace HeroDefense.Tests
             root = new GameObject("CombatTestRoot",typeof(RectTransform)); registry = new CombatRegistry();
             var effects = new GameObject("Effects",typeof(FloatingDamageTextPool)); effects.transform.SetParent(root.transform);
             pool = new CombatPool(root.transform,registry,effects.GetComponent<FloatingDamageTextPool>());
-            sword=Resources.Load<UnitData>("UnitData/PlayerSwordsman"); slime=Resources.Load<UnitData>("UnitData/EnemySlime");
+            sword=RuntimeUnitCatalog.Get("PlayerSwordsman"); slime=RuntimeUnitCatalog.Get("EnemySlime");
         }
         [TearDown] public void Teardown() { Time.timeScale=1; Object.DestroyImmediate(root); }
 
