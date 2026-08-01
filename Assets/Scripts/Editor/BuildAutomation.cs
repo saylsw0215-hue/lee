@@ -26,6 +26,13 @@ namespace HeroDefense.Editor
                 output => Directory.Exists(output), "macOS .app bundle");
         }
 
+        [MenuItem("Tools/Hero Defense/Build/WebGL for GitHub Pages")]
+        public static void BuildWebGL()
+        {
+            RunBuild(BuildTarget.WebGL,"Builds/WebGL",ConfigureWebGL,
+                output=>File.Exists(Path.Combine(output,"index.html")),"WebGL site");
+        }
+
         [MenuItem("Tools/Hero Defense/Build/iOS Xcode Project")]
         public static void BuildIOS()
         {
@@ -120,6 +127,15 @@ namespace HeroDefense.Editor
             PlayerSettings.resizableWindow = true; PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
             // 2 is Unity's macOS Universal (Intel 64-bit + Apple Silicon) architecture value.
             PlayerSettings.SetArchitecture(NamedBuildTarget.Standalone, 2);
+        }
+
+        private static void ConfigureWebGL()
+        {
+            PlayerSettings.productName="Hero Defense";
+            PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;
+            // GitHub Pages cannot attach Unity's gzip/brotli response headers, so publish uncompressed files.
+            PlayerSettings.WebGL.compressionFormat=WebGLCompressionFormat.Disabled;
+            PlayerSettings.WebGL.decompressionFallback=false;
         }
 
         private static void ConfigureIOS()

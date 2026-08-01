@@ -1,9 +1,6 @@
 name: Hero Defense Unity CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
     inputs:
       build_target:
@@ -153,4 +150,3 @@ jobs:
         with:
           name: HeroDefense-iOS-Xcode
           path: build
-
