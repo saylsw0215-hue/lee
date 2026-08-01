@@ -42,6 +42,8 @@ namespace HeroDefense.Battle
                 CombatUnit unit = active[i]; unit.ReturnWithoutReward(); EnsureQueue(unit.Data.UnitId); queues[unit.Data.UnitId].Enqueue(unit);
             }
             active.Clear();
+            texts?.ReturnAll();
+            projectiles?.ReturnAll();
         }
         private CombatUnit Create(UnitData data)
         {
