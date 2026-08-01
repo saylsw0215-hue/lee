@@ -29,6 +29,7 @@ namespace HeroDefense.Battle
         public bool IsVictorious{get;private set;}
         public bool IsStageEnded=>IsDefeated||IsVictorious;
         public CombatRegistry Registry=>registry;public RectTransform World{get;}
+        public int CreatedUnitCount=>pool.CreatedCount;public int ActiveProjectileCount=>World.GetComponentInChildren<ProjectilePool>()?.ActiveCount??0;public int ActiveDamageTextCount=>pool.DamageTexts.ActiveCount;
         private readonly BattleSessionState state;
         private readonly PauseController pause;
         private readonly BuildingSelectionModel buildingSelection;

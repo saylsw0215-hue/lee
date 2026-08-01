@@ -17,6 +17,7 @@ namespace HeroDefense.Battle
         private readonly List<CombatUnit> active = new(40);
         public IReadOnlyList<CombatUnit> Active => active;
         public FloatingDamageTextPool DamageTexts=>texts;
+        public int CreatedCount{get;private set;}
 
         public CombatPool(Transform parent, CombatRegistry registry, FloatingDamageTextPool texts,ProjectilePool projectilePool=null)
         { this.parent = parent; this.registry = registry; this.texts = texts;projectiles=projectilePool; }
@@ -48,6 +49,7 @@ namespace HeroDefense.Battle
         }
         private CombatUnit Create(UnitData data)
         {
+            CreatedCount++;
             var go = new GameObject($"Pooled_{data.UnitId}", typeof(RectTransform), typeof(HealthComponent), typeof(UnitVisualController), typeof(CombatUnit));
             go.transform.SetParent(parent, false); CombatUnit unit = go.GetComponent<CombatUnit>(); unit.Construct(data, registry, this, texts,projectiles); return unit;
         }
