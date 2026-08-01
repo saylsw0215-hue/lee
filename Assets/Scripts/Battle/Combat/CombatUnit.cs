@@ -15,6 +15,7 @@ namespace HeroDefense.Battle.Combat
     {
         public const float PixelsPerUnit = 72f;
         public event Action<CombatUnit, DamageInfo> Died;
+        public event Action<CombatUnit, DamageInfo, DamageResult> DamageResolved;
         public UnitData Data { get; private set; }
         public Team Team => Data.Team;
         public bool IsAlive => health != null && health.IsAlive && State != CombatUnitState.Dead && State != CombatUnitState.Inactive;
@@ -41,7 +42,7 @@ namespace HeroDefense.Battle.Combat
         public void Construct(UnitData data, CombatRegistry valueRegistry, CombatPool pool, FloatingDamageTextPool texts,ProjectilePool projectilePool)
         {
             Data = data; registry = valueRegistry; ownerPool = pool; damageTexts = texts;projectiles=projectilePool;
-            health = GetComponent<HealthComponent>(); visual = GetComponent<UnitVisualController>(); visual.Build(data);RuntimeStats=new RuntimeCombatStats(data.AdvancedStats);Statuses=new StatusEffectController(this);Statuses.Changed+=()=>visual.SetStatuses(Statuses.Active);if(data.VisualShape==UnitVisualShape.PoisonGoblin)poisonStatus=RuntimeStatusCatalog.Get("Poison");if(data.VisualShape==UnitVisualShape.ShamanGoblin)shamanPower=RuntimeStatusCatalog.Get("ShamanPower");
+            health = GetComponent<HealthComponent>(); visual = GetComponent<UnitVisualController>(); visual.Build(data);RuntimeStats=new RuntimeCombatStats(data.AdvancedStats);Statuses=new StatusEffectController(this);Statuses.Changed+=OnStatusesChanged;Statuses.Applied+=OnStatusApplied;if(data.VisualShape==UnitVisualShape.PoisonGoblin)poisonStatus=RuntimeStatusCatalog.Get("Poison");if(data.VisualShape==UnitVisualShape.ShamanGoblin)shamanPower=RuntimeStatusCatalog.Get("ShamanPower");
             health.HealthChanged += visual.SetHealth; health.Damaged += OnDamaged; health.Died += OnDeath;
             gameObject.SetActive(false);
         }
@@ -49,7 +50,7 @@ namespace HeroDefense.Battle.Combat
         public void Spawn(Vector2 localPosition, float limit)
         {
             suppressReward = false; forwardLimit = limit; transform.localPosition = localPosition; transform.localScale = Vector3.one;
-            CurrentTarget = null; targetTimer = 0f;specialTimer=3f; cooldown.Reset();RuntimeStats.Clear();HeroDefense.Progression.BattleModifierRepository.Current?.Apply(RuntimeStats,false,Data.UnitId);float spawnHealth=Data.MaxHealth;if(Data.Team==Team.Player){spawnHealth*=MetaRuntimeModifierProvider.UnitHealthMultiplier;RuntimeStats.Add(new StatModifier("meta_unit_attack",CombatStat.AttackPower,StatModifierType.MultiplicativePercent,MetaRuntimeModifierProvider.UnitAttackMultiplier-1));RuntimeStats.Add(new StatModifier("meta_unit_critical",CombatStat.CriticalChance,StatModifierType.Flat,MetaRuntimeModifierProvider.UnitCriticalBonus));}else{DifficultyModifiers m=DifficultyModifiers.For(BattleLaunchConfig.Difficulty);RuntimeStats.Add(new StatModifier("difficulty",CombatStat.AttackPower,StatModifierType.MultiplicativePercent,m.EnemyDamage-1));RuntimeStats.Add(new StatModifier("difficulty",CombatStat.MoveSpeed,StatModifierType.MultiplicativePercent,m.EnemySpeed-1));spawnHealth*=m.EnemyHealth;if(BattleLaunchConfig.Mode==GameMode.Endless){int wave=Mathf.Max(1,HeroDefense.Battle.Waves.EndlessSession.CurrentWave);spawnHealth*=HeroDefense.Battle.Waves.EndlessWaveGenerator.HealthMultiplier(wave);RuntimeStats.Add(new StatModifier("endless",CombatStat.AttackPower,StatModifierType.MultiplicativePercent,HeroDefense.Battle.Waves.EndlessWaveGenerator.DamageMultiplier(wave)-1));}}Statuses.Clear();Shields.Clear();health.Initialize(spawnHealth); visual.ResetVisual();
+            CurrentTarget = null; targetTimer = 0f;specialTimer=3f; cooldown.Reset();RuntimeStats.Clear();HeroDefense.Progression.BattleModifierRepository.Current?.Apply(RuntimeStats,false,Data.UnitId);float spawnHealth=Data.MaxHealth;if(Data.Team==Team.Player){spawnHealth*=MetaRuntimeModifierProvider.UnitHealthMultiplier;RuntimeStats.Add(new StatModifier("meta_unit_attack",CombatStat.AttackPower,StatModifierType.MultiplicativePercent,MetaRuntimeModifierProvider.UnitAttackMultiplier-1));RuntimeStats.Add(new StatModifier("meta_unit_critical",CombatStat.CriticalChance,StatModifierType.Flat,MetaRuntimeModifierProvider.UnitCriticalBonus));}else{DifficultyModifiers m=DifficultyModifiers.For(BattleLaunchConfig.Difficulty);RuntimeStats.Add(new StatModifier("difficulty",CombatStat.AttackPower,StatModifierType.MultiplicativePercent,m.EnemyDamage-1));RuntimeStats.Add(new StatModifier("difficulty",CombatStat.MoveSpeed,StatModifierType.MultiplicativePercent,m.EnemySpeed-1));spawnHealth*=m.EnemyHealth;if(BattleLaunchConfig.Mode==GameMode.Stage){var selectedStage=BattleLaunchConfig.SelectedStage;spawnHealth*=selectedStage.EnemyHealthMultiplier;RuntimeStats.Add(new StatModifier("stage_balance",CombatStat.AttackPower,StatModifierType.MultiplicativePercent,selectedStage.EnemyDamageMultiplier-1));}else{int wave=Mathf.Max(1,HeroDefense.Battle.Waves.EndlessSession.CurrentWave);spawnHealth*=HeroDefense.Battle.Waves.EndlessWaveGenerator.HealthMultiplier(wave);RuntimeStats.Add(new StatModifier("endless",CombatStat.AttackPower,StatModifierType.MultiplicativePercent,HeroDefense.Battle.Waves.EndlessWaveGenerator.DamageMultiplier(wave)-1));}}Statuses.Clear();Shields.Clear();health.Initialize(spawnHealth); visual.ResetVisual();
             State = CombatUnitState.Idle; gameObject.SetActive(true); registry.Register(this);
         }
 
@@ -84,7 +85,7 @@ namespace HeroDefense.Battle.Combat
         private int BuffNearbyEnemies(){if(shamanPower==null)shamanPower=RuntimeStatusCatalog.Get("ShamanPower");if(shamanPower==null||Team!=Team.Enemy)return 0;registry.CollectEnemies(specialScratch);float radius=5f*PixelsPerUnit,squared=radius*radius;int applied=0;for(int i=0;i<specialScratch.Count;i++){if(specialScratch[i] is not CombatUnit unit||unit==this||(unit.transform.localPosition-transform.localPosition).sqrMagnitude>squared)continue;var result=unit.ApplyStatus(shamanPower,gameObject,.15f);if(result==StatusApplyResult.Applied||result==StatusApplyResult.Refreshed)applied++;}return applied;}
         public int TriggerSupportBuffForDebug()=>BuffNearbyEnemies();
         public void TakeDamage(DamageInfo damageInfo)=>ApplyAdvancedDamage(damageInfo);
-        public DamageResult ApplyAdvancedDamage(DamageInfo damageInfo){if(damageInfo.SourceTeam==Team)return default;var adjusted=new DamageInfo(damageInfo.Amount*(1f-damageReduction),damageInfo.SourceTeam,damageInfo.Source,damageInfo.DamageType,damageInfo.CanCritical,damageInfo.CanDodge,damageInfo.IsSkill,damageInfo.IsUltimate,damageInfo.IsDamageOverTime,damageInfo.SkillId,damageInfo.HitSequence,damageInfo.CriticalChanceBonus,damageInfo.CriticalDamageBonus,damageInfo.ArmorPenetrationFlat,damageInfo.ArmorPenetrationPercent,gameObject);LastDamageResult=AdvancedCombatResolver.Apply(this,adjusted);if(LastDamageResult.WasDodged)damageTexts?.ShowText(transform.parent,transform.localPosition,"DODGE",new Color(.7f,.9f,1f),34);else if(LastDamageResult.ShieldAbsorbed>0&&LastDamageResult.HealthDamage<=0)damageTexts?.ShowText(transform.parent,transform.localPosition,$"SHIELD {Mathf.RoundToInt(LastDamageResult.ShieldAbsorbed)}",new Color(.3f,.8f,1f),25);else if(LastDamageResult.WasApplied)damageTexts?.ShowAdvanced(transform.parent,transform.localPosition,LastDamageResult.HealthDamage,LastDamageResult.WasCritical,damageInfo.DamageType);return LastDamageResult;}
+        public DamageResult ApplyAdvancedDamage(DamageInfo damageInfo){if(damageInfo.SourceTeam==Team)return default;var adjusted=new DamageInfo(damageInfo.Amount*(1f-damageReduction),damageInfo.SourceTeam,damageInfo.Source,damageInfo.DamageType,damageInfo.CanCritical,damageInfo.CanDodge,damageInfo.IsSkill,damageInfo.IsUltimate,damageInfo.IsDamageOverTime,damageInfo.SkillId,damageInfo.HitSequence,damageInfo.CriticalChanceBonus,damageInfo.CriticalDamageBonus,damageInfo.ArmorPenetrationFlat,damageInfo.ArmorPenetrationPercent,gameObject);LastDamageResult=AdvancedCombatResolver.Apply(this,adjusted);DamageResolved?.Invoke(this,adjusted,LastDamageResult);damageTexts?.ShowResolved(transform.parent,transform.localPosition,LastDamageResult,damageInfo.DamageType);return LastDamageResult;}
         public StatusApplyResult ApplyStatus(StatusEffectData data,GameObject source=null,float potency=-1,IDamageable tauntSource=null)=>Statuses.Apply(data,source,potency,tauntSource);
         public void ApplyStun(float duration)=>stunRemaining=Mathf.Max(stunRemaining,duration);
         public void ApplyDamageReduction(float amount,float duration){damageReduction=Mathf.Max(damageReduction,Mathf.Clamp01(amount));damageReductionRemaining=Mathf.Max(damageReductionRemaining,duration);}
@@ -92,6 +93,8 @@ namespace HeroDefense.Battle.Combat
         {
             visual.PlayHit();
         }
+        private void OnStatusesChanged()=>visual.SetStatuses(Statuses.Active);
+        private void OnStatusApplied(StatusEffectData data,StatusApplyResult result){if(result==StatusApplyResult.Applied||result==StatusApplyResult.Stacked)damageTexts?.ShowText(transform.parent,transform.localPosition,data.DisplayName,data.Color,22);}
         private void OnDeath(DamageInfo info)
         {
             State = CombatUnitState.Dead; CurrentTarget = null; registry.Unregister(this); Died?.Invoke(this, suppressReward ? default : info);
@@ -100,7 +103,7 @@ namespace HeroDefense.Battle.Combat
         private IEnumerator DeathRoutine()
         {
             float elapsed = 0f; Vector3 initial = transform.localScale;
-            while (elapsed < .3f) { elapsed += Time.deltaTime; transform.localScale = Vector3.Lerp(initial, Vector3.zero, elapsed / .3f); yield return null; }
+            while (elapsed < .3f) { elapsed += Time.deltaTime;float progress=Mathf.Clamp01(elapsed/.3f);transform.localScale = Vector3.Lerp(initial, Vector3.zero, progress);visual.SetDeathProgress(progress);yield return null; }
             ownerPool.Return(this);
         }
         public void ReturnWithoutReward()
@@ -108,6 +111,7 @@ namespace HeroDefense.Battle.Combat
             suppressReward = true; StopAllCoroutines(); registry.Unregister(this); CurrentTarget = null;stunRemaining=damageReductionRemaining=damageReduction=0;Statuses?.Clear();Shields.Clear();RuntimeStats?.Clear();State = CombatUnitState.Inactive; gameObject.SetActive(false);
         }
         internal void MarkPooled() { CurrentTarget = null; State = CombatUnitState.Inactive; gameObject.SetActive(false); }
+        private void OnDestroy(){if(health!=null){health.HealthChanged-=visual.SetHealth;health.Damaged-=OnDamaged;health.Died-=OnDeath;}if(Statuses!=null){Statuses.Changed-=OnStatusesChanged;Statuses.Applied-=OnStatusApplied;}}
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()

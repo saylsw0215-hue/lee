@@ -6,12 +6,11 @@ namespace HeroDefense.Battle.Combat
     /// <summary>Runtime status definitions that bypass Unity Resources on macOS.</summary>
     public static class RuntimeStatusCatalog
     {
+        private static readonly string[] Names={"Burn","Freeze","Invincible","Poison","ShamanPower","Shock","Silence","Slow","Stun","Taunt"};
         private static readonly Dictionary<string,StatusEffectData> Items=new();
+        public static StatusEffectData[] GetAll(){var result=new StatusEffectData[Names.Length];for(int i=0;i<Names.Length;i++)result[i]=Get(Names[i]);return result;}
         public static StatusEffectData Get(string name)
         {
-#if UNITY_EDITOR
-            StatusEffectData authored=Resources.Load<StatusEffectData>("StatusEffects/"+name);if(authored!=null)return authored;
-#endif
             if(Items.TryGetValue(name,out StatusEffectData item))return item;
             item=name switch
             {

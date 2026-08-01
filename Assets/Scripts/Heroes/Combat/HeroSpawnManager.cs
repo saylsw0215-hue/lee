@@ -19,7 +19,7 @@ namespace HeroDefense.Heroes
             var aimObject=new GameObject("SkillAimingController",typeof(SkillAimingController));aimObject.transform.SetParent(safe,false);Aiming=aimObject.GetComponent<SkillAimingController>();Aiming.Initialize(safe,combat.World,Hero);
             var hudObject=new GameObject("HeroHudController",typeof(HeroHudController));hudObject.transform.SetParent(safe,false);hudObject.GetComponent<HeroHudController>().Initialize(safe,Hero,Aiming);combat.BattleReset+=OnReset;
         }
-        private void OnReset(){Aiming?.Cancel();statistics.SelectHero(Hero.Data.HeroId);Hero.ResetHero();}
+        private void OnReset(){Aiming?.Cancel();effects?.ReturnAll();statistics.SelectHero(Hero.Data.HeroId);Hero.ResetHero();}
         public void OnVictory(){Aiming?.Cancel();Hero.SetOutcome(true);}public void OnDefeat(){Aiming?.Cancel();Hero.SetOutcome(false);}
         private void OnDestroy(){if(combat!=null)combat.BattleReset-=OnReset;}
     }

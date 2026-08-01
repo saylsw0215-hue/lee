@@ -21,7 +21,7 @@ namespace HeroDefense.Tests
             root = new GameObject("CombatTestRoot",typeof(RectTransform)); registry = new CombatRegistry();
             var effects = new GameObject("Effects",typeof(FloatingDamageTextPool)); effects.transform.SetParent(root.transform);
             pool = new CombatPool(root.transform,registry,effects.GetComponent<FloatingDamageTextPool>());
-            sword=Resources.Load<UnitData>("UnitData/PlayerSwordsman"); slime=Resources.Load<UnitData>("UnitData/EnemySlime");
+            sword=RuntimeUnitCatalog.Get("PlayerSwordsman"); slime=RuntimeUnitCatalog.Get("EnemySlime");
         }
         [TearDown] public void Teardown() { Time.timeScale=1; Object.DestroyImmediate(root); }
 
@@ -29,10 +29,10 @@ namespace HeroDefense.Tests
         public IEnumerator Units_ApproachStopAndDealDamage()
         {
             CombatUnit player=pool.Spawn(sword,new Vector2(-280,0),600); CombatUnit enemy=pool.Spawn(slime,new Vector2(280,0),-600);
-            float initialDistance=Vector3.Distance(player.transform.localPosition,enemy.transform.localPosition);
+            float initialDistance=Vector3.Distance(player.transform.localPosition,enemy.transform.localPosition),initialHealth=enemy.Health.CurrentHealth;
             for(int i=0;i<30;i++){ player.Simulate(.1f); enemy.Simulate(.1f); }
             Assert.Less(Vector3.Distance(player.transform.localPosition,enemy.transform.localPosition),initialDistance);
-            Assert.Less(enemy.GetComponent<HealthComponent>().CurrentHealth,slime.MaxHealth);
+            Assert.Less(enemy.GetComponent<HealthComponent>().CurrentHealth,initialHealth);
             yield return null;
         }
 

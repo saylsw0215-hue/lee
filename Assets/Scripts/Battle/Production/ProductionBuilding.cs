@@ -17,7 +17,7 @@ namespace HeroDefense.Battle.Production
         private readonly ProductionTimer timer=new();
         private Func<UnitData,Vector2,bool> tryProduce;
         private Func<bool> blocked;
-        private Image body,progress,levelBadge; private Text levelText; private bool selected;
+        private Image body,progress,levelBadge; private Text levelText; private bool selected;private float productionFeedback;
 
         public void Initialize(BuildingData data,BuildSlotView slot,Func<UnitData,Vector2,bool> produce,Func<bool> isBlocked)
         {
@@ -44,8 +44,9 @@ namespace HeroDefense.Battle.Production
         {
             if(Runtime==null||Runtime.IsSold||Runtime.IsConstructing||blocked())return;
             float interval=Runtime.Data.GetProductionInterval(Runtime.CurrentLevel)*(HeroDefense.Progression.BattleModifierRepository.Current?.ProductionIntervalMultiplier??1f)*MetaRuntimeModifierProvider.ProductionIntervalMultiplier;
-            if(timer.Tick(Time.deltaTime,interval)&&tryProduce(Runtime.Data.ProducedUnit,Slot.RectTransform.anchoredPosition+new Vector2(90,-25)))timer.Consume();
+            if(timer.Tick(Time.deltaTime,interval)&&tryProduce(Runtime.Data.ProducedUnit,Slot.RectTransform.anchoredPosition+new Vector2(90,-25))){timer.Consume();productionFeedback=.18f;}
             progress.fillAmount=timer.Progress(interval);
+            if(productionFeedback>0){productionFeedback=Mathf.Max(0,productionFeedback-Time.deltaTime);progress.color=Color.Lerp(new Color(.2f,.88f,.38f),Color.white,productionFeedback/.18f);}else progress.color=new Color(.2f,.88f,.38f);
         }
         public bool Upgrade()
         {
@@ -60,6 +61,6 @@ namespace HeroDefense.Battle.Production
         public void SetSelected(bool value){selected=value;ResetVisual();}
         private void ResetVisual(){if(body==null)return;transform.localScale=selected?Vector3.one*1.08f:Vector3.one;Color normal=body.sprite!=null?Color.white:Runtime.Data.BuildingColor;body.color=selected?Color.Lerp(normal,new Color(1f,.78f,.25f),.28f):normal;}
         private void RefreshLevel(){levelText.text=Runtime.CurrentLevel.ToString();transform.localScale=Vector3.one*(1f+(Runtime.CurrentLevel-1)*.05f);}
-        public void StopImmediately(){StopAllCoroutines();enabled=false;}
+        public void StopImmediately(){StopAllCoroutines();productionFeedback=0;enabled=false;}
     }
 }

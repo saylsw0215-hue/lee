@@ -46,6 +46,6 @@ namespace HeroDefense.Editor
     public static class BalanceSimulationRunner
     {
         [MenuItem("Tools/Hero Defense/Balance/Run Stage Simulation")]
-        public static void Run(){Directory.CreateDirectory("Builds/Balance");string path="Builds/Balance/stage-simulation.csv";var lines=new List<string>{"seed,stage,difficulty,hero,won,clear_seconds,base_hp,average_units"};string[] heroes=GameContentDatabase.Heroes.Select(x=>x.HeroId).ToArray();var random=new System.Random(1001);for(int i=0;i<300;i++){int difficulty=i%3;double baseChance=difficulty==0?.9:difficulty==1?.66:.34;double heroOffset=((i%heroes.Length)-2.5)*.012;bool won=random.NextDouble()<baseChance+heroOffset;int hp=won?random.Next(25,101):0;lines.Add($"{1001+i},stage_01_grassland,{(GameDifficulty)difficulty},{heroes[i%heroes.Length]},{won.ToString().ToLowerInvariant()},{(won?random.Next(360,760):random.Next(180,620))},{hp},{random.Next(12,31)}");}File.WriteAllLines(path,lines);Debug.Log("Deterministic reference simulation written: "+Path.GetFullPath(path));}
+        public static void Run(){Directory.CreateDirectory("Builds/Balance");Debug.Log("Stage 1 balance now uses the real Battle scene. Run the explicit StageOneBalanceScenarioPlayModeTests fixture, or dispatch GitHub Actions with build_target=balance. JSON output is written to "+Path.GetFullPath("Builds/Balance"));}
     }
 }

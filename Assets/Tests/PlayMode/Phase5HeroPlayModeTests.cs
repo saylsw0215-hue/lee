@@ -96,7 +96,8 @@ namespace HeroDefense.Tests
         private static void Select(string resource)
         {
             if (HeroSelectionService.Instance == null) new GameObject("HeroSelectionService", typeof(HeroSelectionService));
-            HeroSelectionService.Instance.Select(Resources.Load<HeroData>("HeroData/" + resource));
+            string id=resource=="ArdenKnight"?"hero_arden_knight":resource=="RianRanger"?"hero_rian_ranger":"hero_sera_fire_mage";
+            HeroSelectionService.Instance.Select(GameContentDatabase.Hero(id));
         }
 
         private static CombatUnit SpawnEnemyNear(HeroController hero, string resource)
@@ -104,7 +105,7 @@ namespace HeroDefense.Tests
             BattleSceneController scene = Object.FindAnyObjectByType<BattleSceneController>();
             FieldInfo field = typeof(BattleSceneController).GetField("combat", BindingFlags.Instance | BindingFlags.NonPublic);
             BattleCombatController combat = (BattleCombatController)field.GetValue(scene);
-            combat.Spawn(Resources.Load<UnitData>("UnitData/" + resource));
+            combat.Spawn(RuntimeUnitCatalog.Get(resource));
             CombatUnit[] units = Object.FindObjectsByType<CombatUnit>(FindObjectsInactive.Exclude);
             CombatUnit enemy = null;
             for (int i = 0; i < units.Length; i++) if (units[i].Team == Team.Enemy) enemy = units[i];

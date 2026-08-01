@@ -11,9 +11,6 @@ namespace HeroDefense.Battle.Combat
         public static UnitData[] GetAll(){var result=new UnitData[Names.Length];for(int i=0;i<Names.Length;i++)result[i]=Get(Names[i]);return result;}
         public static UnitData Get(string name)
         {
-#if UNITY_EDITOR
-            UnitData authored=Resources.Load<UnitData>("UnitData/"+name);if(authored!=null)return authored;
-#endif
             if(Items.TryGetValue(name,out UnitData existing))return existing;
             UnitData data=name switch
             {
@@ -24,7 +21,7 @@ namespace HeroDefense.Battle.Combat
                 "EnemyGoblin"=>Create("enemy_goblin","고블린",Team.Enemy,90,2.2f,12,1,.9f,8,.43f,15,new Color(.78f,.38f,.12f),UnitVisualShape.Goblin,12,6),
                 "EnemyEliteSlime"=>Create("enemy_elite_slime","정예 슬라임",Team.Enemy,240,1.3f,18,1.2f,1.4f,8,.65f,40,new Color(.18f,.72f,.68f),UnitVisualShape.EliteSlime,25,18),
                 "EnemyEliteGoblin"=>Create("enemy_elite_goblin","정예 고블린",Team.Enemy,280,2,24,1.2f,.9f,9,.62f,50,new Color(.78f,.18f,.16f),UnitVisualShape.EliteGoblin,30,15),
-                "BossGoblinChieftain"=>Create("boss_goblin_chieftain","고블린 대장",Team.Enemy,1800,1.2f,45,1.6f,1.5f,10,.9f,300,new Color(.62f,.08f,.06f),UnitVisualShape.BossGoblin,55,35),
+                "BossGoblinChieftain"=>Create("boss_goblin_chieftain","고블린 대장",Team.Enemy,2600,1.2f,48,1.6f,1.4f,10,.9f,300,new Color(.62f,.08f,.06f),UnitVisualShape.BossGoblin,60,40),
                 "EnemyPoisonGoblin"=>Create("enemy_poison_goblin","독 고블린",Team.Enemy,130,1.7f,12,4.5f,1.6f,9,.44f,18,new Color(.32f,.7f,.14f),UnitVisualShape.PoisonGoblin,10,18),
                 "EnemyShamanGoblin"=>Create("enemy_shaman_goblin","주술 고블린",Team.Enemy,160,1.4f,18,5,2,10,.46f,25,new Color(.55f,.18f,.72f),UnitVisualShape.ShamanGoblin,14,24),
                 "PlayerGuard"=>Create("player_guard","방패병",Team.Player,210,1.5f,12,1.1f,1.3f,8,.52f,0,new Color(.16f,.38f,.62f),UnitVisualShape.Guard,65,25),

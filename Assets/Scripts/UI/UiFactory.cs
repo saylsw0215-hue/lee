@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
+using HeroDefense.Audio;
 
 namespace HeroDefense.UI
 {
@@ -66,6 +67,7 @@ namespace HeroDefense.UI
             var image=go.GetComponent<Image>();image.sprite=RoundedSprite;image.type=Image.Type.Sliced;image.color = color;
             var layout = go.GetComponent<LayoutElement>(); layout.preferredWidth = 310; layout.preferredHeight = 96; layout.minHeight = 72;
             var button = go.GetComponent<Button>(); var colors = button.colors; colors.highlightedColor = Color.Lerp(color, Color.white, .2f); colors.pressedColor = Color.Lerp(color, Color.black, .2f); button.colors = colors;
+            button.onClick.AddListener(()=>{AudioManager.Instance?.NotifyUserGesture();AudioManager.Instance?.PlayEvent(GameAudioEvent.ButtonClick);});
             var shadow=go.AddComponent<Shadow>();shadow.effectColor=new Color(0,0,0,.52f);shadow.effectDistance=new Vector2(4,-5);
             var outline=go.AddComponent<Outline>();outline.effectColor=Color.Lerp(new Color(1f,.72f,.26f,.62f),color,.35f);outline.effectDistance=new Vector2(2,-2);
             var glossObject=new GameObject("SoftGloss",typeof(RectTransform),typeof(Image));glossObject.transform.SetParent(go.transform,false);var gloss=glossObject.GetComponent<Image>();gloss.sprite=RoundedSprite;gloss.type=Image.Type.Sliced;gloss.color=new Color(1,1,1,.075f);gloss.raycastTarget=false;Stretch(gloss.rectTransform,new Vector2(.025f,.54f),new Vector2(.975f,.94f));
