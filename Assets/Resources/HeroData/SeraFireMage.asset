@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a622bba35504538b7f7bba7a8760ef, type: 3}
+  m_Name: SeraFireMage
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroData
+  heroId: hero_sera_fire_mage
+  displayName: "\uC138\uB77C"
+  roleName: "\uAD11\uC5ED \uD3ED\uBC1C \uB51C\uB7EC"
+  description: "\uD654\uC5FC \uD3ED\uBC1C\uACFC \uBA54\uD14C\uC624\uB97C \uC0AC\uC6A9\uD558\uB294
+    \uB9C8\uBC95\uC0AC"
+  archetype: 2
+  maxHealth: 280
+  moveSpeed: 1.9
+  attackDamage: 45
+  attackRange: 5.2
+  attackInterval: 1.5
+  detectionRange: 12
+  respawnDuration: 14
+  activeSkill: {fileID: 11400000, guid: 4263c083f819a47748a1a70f11f34152, type: 2}
+  ultimateSkill: {fileID: 11400000, guid: 25b56e90118d54947aa671d8ddbe52ea, type: 2}
+  passive: {fileID: 11400000, guid: bdc5a45370ace4da9b6113ee549bf953, type: 2}
+  portrait: {fileID: 0}
+  fullBodyImage: {fileID: 0}
+  prefab: {fileID: 2591551168176712865, guid: 0007e804ab28d40078ec0337effcaa44, type: 3}
+  placeholderColor: {r: 0.82, g: 0.18, b: 0.08, a: 1}
+  visualShape: 2
+  advancedStats:
+    defense: 12
+    magicDefense: 45
+    criticalChance: 0.12
+    criticalDamageMultiplier: 1.65
+    dodgeChance: 0.05
+    accuracy: 0.05
+    armorPenetrationFlat: 0
+    armorPenetrationPercent: 0
+    crowdControlResistance: 0.1
+    statusEffectResistance: 0.1
+    maxShield: 0

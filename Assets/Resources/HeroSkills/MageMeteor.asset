@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce49f0bf7af24660bd4fc5b7cdcbc2a, type: 3}
+  m_Name: MageMeteor
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroSkillData
+  skillId: ultimate_mage_meteor
+  displayName: "\uBA54\uD14C\uC624"
+  description: "\uBC00\uC9D1 \uC9C0\uC5ED\uC5D0 \uAC15\uB825\uD55C \uC6B4\uC11D"
+  kind: 5
+  cooldown: 0
+  castTime: 0.55
+  range: 14
+  radius: 4.5
+  damageMultiplier: 5
+  duration: 1
+  maxTargets: 35
+  requiredEnergy: 100
+  targetingMode: 7
+  icon: {fileID: 0}
+  placeholderColor: {r: 1, g: 0.12, b: 0.02, a: 1}

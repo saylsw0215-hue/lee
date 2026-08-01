@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 910337f19fc8d43e0a2a5326da51b85e, type: 3}
+  m_Name: ArcheryRange
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Battle.Buildings.BuildingData
+  buildingId: building_archery_range
+  displayName: "\uC0AC\uACA9\uC7A5"
+  description: "\uAD81\uC218\uB97C \uC790\uB3D9 \uC0DD\uC0B0\uD569\uB2C8\uB2E4."
+  buildCost: 140
+  sellRatio: 0.5
+  producedUnit: {fileID: 11400000, guid: be04a448cbdc44ef885b25da9024d914, type: 2}
+  levels:
+  - productionInterval: 6
+    upgradeCost: 140
+  - productionInterval: 5
+    upgradeCost: 220
+  - productionInterval: 4
+    upgradeCost: 0
+  buildingColor: {r: 0.48, g: 0.31, b: 0.15, a: 1}
+  buildingSize: {x: 108, y: 100}
+  visualShape: 1

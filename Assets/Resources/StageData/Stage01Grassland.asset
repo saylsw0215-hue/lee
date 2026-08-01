@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf26c4fbc1568447485f272b46996bf1, type: 3}
+  m_Name: Stage01Grassland
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Battle.Stages.StageData
+  stageId: stage_01_grassland
+  displayName: "\uCD08\uC6D0\uC758 \uAD00\uBB38"
+  description: "\uCD08\uC6D0 \uAD00\uBB38\uC744 \uC9C0\uD0A4\uACE0 \uACE0\uBE14\uB9B0
+    \uB300\uC7A5\uC744 \uCC98\uCE58\uD558\uC2ED\uC2DC\uC624."
+  startingGold: 500
+  baseMaxHealth: 100
+  victoryReward: 300
+  difficulty: "\uBCF4\uD1B5"
+  backgroundColor: {r: 0.2, g: 0.38, b: 0.22, a: 1}
+  waves:
+  - {fileID: 11400000, guid: 3f57d9fc6ef3d4becbbd3e51a20422f1, type: 2}
+  - {fileID: 11400000, guid: bfa77b9b80afd40b2b4e98b3535364e1, type: 2}
+  - {fileID: 11400000, guid: 096d707495a534978928f42ab07af47c, type: 2}
+  - {fileID: 11400000, guid: 6cc4c83df639e41b39e96a7ea3e90308, type: 2}
+  - {fileID: 11400000, guid: 228669ae0db5043cb8daa204106cfacc, type: 2}
+  - {fileID: 11400000, guid: e98b60b33cf1743b3b2ff1bd621968f0, type: 2}
+  - {fileID: 11400000, guid: 58da81aed3c0b4a1ca4c900f68f20b1f, type: 2}
+  - {fileID: 11400000, guid: 7f13a1d81447d41b595fc0c8a1e5b20a, type: 2}
+  - {fileID: 11400000, guid: 893927054deae43b294f34b8b5c7b4c8, type: 2}
+  - {fileID: 11400000, guid: 8c3595a78a64a46a490f80e689f2e318, type: 2}

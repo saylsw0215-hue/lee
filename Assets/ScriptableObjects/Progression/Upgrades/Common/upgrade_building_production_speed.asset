@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: upgrade_building_production_speed
+  m_EditorClassIdentifier: HeroDefense.Runtime:HeroDefense.Progression:UpgradeData
+  upgradeId: upgrade_building_production_speed
+  displayName: "\uC2E0\uC18D \uC0DD\uC0B0"
+  description: "\uBAA8\uB4E0 \uAC74\uBB3C \uC0DD\uC0B0\uC2DC\uAC04 12% \uAC10\uC18C"
+  heroId: 
+  category: 4
+  rarity: 0
+  maxLevel: 5
+  selectionWeight: 1
+  effects:
+  - kind: 8
+    value: 0.12
+  requirement:
+    battleLevel: 1
+    requiredUpgradeId: 
+    requiredUpgradeLevel: 0

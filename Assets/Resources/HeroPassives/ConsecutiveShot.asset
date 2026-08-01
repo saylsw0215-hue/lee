@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33462ace233f5441fb36b2dcd092d13b, type: 3}
+  m_Name: ConsecutiveShot
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroPassiveData
+  passiveId: passive_consecutive_shot
+  displayName: "\uC5F0\uC18D \uC0AC\uACA9"
+  description: "\uAC19\uC740 \uB300\uC0C1 \uC138 \uBC88\uC9F8 \uACF5\uACA9 \uD53C\uD574
+    50% \uC99D\uAC00"
+  kind: 1
+  value: 0.5
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.25, g: 0.8, b: 0.35, a: 1}

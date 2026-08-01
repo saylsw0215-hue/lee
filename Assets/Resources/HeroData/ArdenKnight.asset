@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a622bba35504538b7f7bba7a8760ef, type: 3}
+  m_Name: ArdenKnight
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroData
+  heroId: hero_arden_knight
+  displayName: "\uC544\uB974\uB374"
+  roleName: "\uADFC\uC811 \uD0F1\uCEE4"
+  description: "\uAC15\uCCA0 \uC758\uC9C0\uB85C \uBCF8\uC9C4\uC744 \uC9C0\uD0A4\uB294
+    \uAE30\uC0AC"
+  archetype: 0
+  maxHealth: 500
+  moveSpeed: 2.1
+  attackDamage: 35
+  attackRange: 1.4
+  attackInterval: 1
+  detectionRange: 10
+  respawnDuration: 12
+  activeSkill: {fileID: 11400000, guid: e8224d04176dd47cfa9bb837c8c6aa61, type: 2}
+  ultimateSkill: {fileID: 11400000, guid: 60952ea9e19f741dfb95fa4826f71a3f, type: 2}
+  passive: {fileID: 11400000, guid: c8cd1fb3a1667406eb964ff9af6b3589, type: 2}
+  portrait: {fileID: 0}
+  fullBodyImage: {fileID: 0}
+  prefab: {fileID: 6632680255565070771, guid: 15206d88c218d43ddaa6846f9763da40, type: 3}
+  placeholderColor: {r: 0.12, g: 0.38, b: 0.85, a: 1}
+  visualShape: 0
+  advancedStats:
+    defense: 55
+    magicDefense: 30
+    criticalChance: 0.08
+    criticalDamageMultiplier: 1.6
+    dodgeChance: 0.03
+    accuracy: 0.05
+    armorPenetrationFlat: 0
+    armorPenetrationPercent: 0
+    crowdControlResistance: 0.1
+    statusEffectResistance: 0.1
+    maxShield: 0

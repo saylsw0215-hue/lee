@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: upgrade_building_initial_progress
+  m_EditorClassIdentifier: HeroDefense.Runtime:HeroDefense.Progression:UpgradeData
+  upgradeId: upgrade_building_initial_progress
+  displayName: "\uC0DD\uC0B0 \uC900\uBE44"
+  description: "\uCCAB \uC0DD\uC0B0 \uC9C4\uD589\uB3C4 50%"
+  heroId: 
+  category: 4
+  rarity: 1
+  maxLevel: 1
+  selectionWeight: 1
+  effects:
+  - kind: 15
+    value: 0.5
+  requirement:
+    battleLevel: 1
+    requiredUpgradeId: 
+    requiredUpgradeLevel: 0

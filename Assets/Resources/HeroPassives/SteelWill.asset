@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33462ace233f5441fb36b2dcd092d13b, type: 3}
+  m_Name: SteelWill
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroPassiveData
+  passiveId: passive_steel_will
+  displayName: "\uAC15\uCCA0 \uC758\uC9C0"
+  description: "\uBCF8\uC9C4 HP 50% \uC774\uD558\uC5D0\uC11C \uBC1B\uB294 \uD53C\uD574
+    20% \uAC10\uC18C"
+  kind: 0
+  value: 0.2
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.2, g: 0.55, b: 1, a: 1}

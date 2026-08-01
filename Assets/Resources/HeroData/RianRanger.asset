@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a622bba35504538b7f7bba7a8760ef, type: 3}
+  m_Name: RianRanger
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroData
+  heroId: hero_rian_ranger
+  displayName: "\uB9AC\uC548"
+  roleName: "\uC6D0\uAC70\uB9AC \uC9C0\uC18D \uB51C\uB7EC"
+  description: "\uBE60\uB978 \uC5F0\uC18D \uC0AC\uACA9\uACFC \uD654\uC0B4\uBE44\uB97C
+    \uC0AC\uC6A9\uD558\uB294 \uB808\uC778\uC800"
+  archetype: 1
+  maxHealth: 320
+  moveSpeed: 2.5
+  attackDamage: 28
+  attackRange: 6
+  attackInterval: 0.8
+  detectionRange: 12
+  respawnDuration: 10
+  activeSkill: {fileID: 11400000, guid: 8501c76cf9f8b416cba207aa838ef472, type: 2}
+  ultimateSkill: {fileID: 11400000, guid: b04c9e626beea4064b2320328ec2e2e4, type: 2}
+  passive: {fileID: 11400000, guid: ebc9e15c3253244fb8d8515d2b32ce85, type: 2}
+  portrait: {fileID: 0}
+  fullBodyImage: {fileID: 0}
+  prefab: {fileID: 6678814880381522176, guid: 95de796a611d74325b8654c20ba63853, type: 3}
+  placeholderColor: {r: 0.14, g: 0.62, b: 0.28, a: 1}
+  visualShape: 1
+  advancedStats:
+    defense: 18
+    magicDefense: 20
+    criticalChance: 0.18
+    criticalDamageMultiplier: 1.75
+    dodgeChance: 0.12
+    accuracy: 0.05
+    armorPenetrationFlat: 0
+    armorPenetrationPercent: 0
+    crowdControlResistance: 0.1
+    statusEffectResistance: 0.1
+    maxShield: 0

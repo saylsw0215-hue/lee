@@ -1,0 +1,7 @@
+using System.Collections.Generic;using HeroDefense.Save;using UnityEngine;using UnityEngine.SceneManagement;using UnityEngine.UI;
+namespace HeroDefense.Accessibility
+{
+    public static class AccessibilitySettingsService{private static SettingsSaveData Settings=>SaveGameManager.Instance?.Data?.settings;public static bool LargeUi=>Settings?.largeUi??false;public static bool HighContrast=>Settings?.highContrast??false;public static bool ColorLabels=>Settings?.colorAccessibility??true;public static bool AimAssist=>Settings?.aimAssist??true;public static void Apply()=>LargeUiController.ApplyToLoadedScene();}
+    public sealed class LargeUiController:MonoBehaviour
+    {private static readonly HashSet<EntityId>applied=new();private void Awake(){DontDestroyOnLoad(gameObject);SceneManager.sceneLoaded+=OnLoaded;ApplyToLoadedScene();}private void OnLoaded(Scene scene,LoadSceneMode mode){applied.Clear();ApplyToLoadedScene();}public static void ApplyToLoadedScene(){if(!AccessibilitySettingsService.LargeUi)return;var texts=Object.FindObjectsByType<Text>(FindObjectsInactive.Include);for(int i=0;i<texts.Length;i++)if(applied.Add(texts[i].GetEntityId()))texts[i].fontSize=Mathf.RoundToInt(texts[i].fontSize*1.16f);var buttons=Object.FindObjectsByType<Button>(FindObjectsInactive.Include);for(int i=0;i<buttons.Length;i++){LayoutElement layout=buttons[i].GetComponent<LayoutElement>();if(layout!=null)layout.minHeight=Mathf.Max(layout.minHeight,64);}}private void OnDestroy(){SceneManager.sceneLoaded-=OnLoaded;}}
+}

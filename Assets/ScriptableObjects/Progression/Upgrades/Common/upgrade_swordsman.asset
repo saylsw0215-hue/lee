@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: upgrade_swordsman
+  m_EditorClassIdentifier: HeroDefense.Runtime:HeroDefense.Progression:UpgradeData
+  upgradeId: upgrade_swordsman
+  displayName: "\uAC80\uC0AC\uC758 \uB9F9\uC138"
+  description: "\uAC80\uC0AC \uCCB4\uB825 +20%, \uBC29\uC5B4\uB825 +10"
+  heroId: 
+  category: 3
+  rarity: 0
+  maxLevel: 4
+  selectionWeight: 1
+  effects:
+  - kind: 1
+    value: 10
+  requirement:
+    battleLevel: 1
+    requiredUpgradeId: 
+    requiredUpgradeLevel: 0

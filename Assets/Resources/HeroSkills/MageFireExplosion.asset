@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce49f0bf7af24660bd4fc5b7cdcbc2a, type: 3}
+  m_Name: MageFireExplosion
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroSkillData
+  skillId: skill_mage_fire_explosion
+  displayName: "\uD654\uC5FC \uD3ED\uBC1C"
+  description: "220% \uBC94\uC704 \uD53C\uD574\uC640 \uD654\uC0C1"
+  kind: 4
+  cooldown: 12
+  castTime: 0.3
+  range: 12
+  radius: 3
+  damageMultiplier: 2.2
+  duration: 3
+  maxTargets: 10
+  requiredEnergy: 0
+  targetingMode: 7
+  icon: {fileID: 0}
+  placeholderColor: {r: 1, g: 0.28, b: 0.05, a: 1}

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83db9ed6ca9b94b068bb3d15247647fc, type: 3}
+  m_Name: EnemyEliteSlime
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Battle.Combat.UnitData
+  unitId: enemy_elite_slime
+  displayName: "\uC815\uC608 \uC2AC\uB77C\uC784"
+  team: 1
+  maxHealth: 240
+  moveSpeed: 1.3
+  attackDamage: 18
+  attackRange: 1.2
+  attackInterval: 1.4
+  detectionRange: 8
+  collisionRadius: 0.65
+  rewardGold: 40
+  placeholderColor: {r: 0.18, g: 0.72, b: 0.68, a: 1}
+  visualShape: 5
+  advancedStats:
+    defense: 40
+    magicDefense: 25
+    criticalChance: 0.05
+    criticalDamageMultiplier: 1.5
+    dodgeChance: 0
+    accuracy: 0
+    armorPenetrationFlat: 0
+    armorPenetrationPercent: 0
+    crowdControlResistance: 0.3
+    statusEffectResistance: 0.15
+    maxShield: 0

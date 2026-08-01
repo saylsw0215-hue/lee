@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce49f0bf7af24660bd4fc5b7cdcbc2a, type: 3}
+  m_Name: RangerHawkeye
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroSkillData
+  skillId: ultimate_ranger_hawkeye
+  displayName: "\uB9E4\uC758 \uB208"
+  description: "8\uCD08 \uACF5\uACA9\uC18D\uB3C4\xB7\uC0AC\uAC70\uB9AC\xB7\uAD00\uD1B5
+    \uAC15\uD654"
+  kind: 3
+  cooldown: 0
+  castTime: 0.25
+  range: 12
+  radius: 2
+  damageMultiplier: 1
+  duration: 8
+  maxTargets: 2
+  requiredEnergy: 100
+  targetingMode: 1
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.45, g: 1, b: 0.35, a: 1}

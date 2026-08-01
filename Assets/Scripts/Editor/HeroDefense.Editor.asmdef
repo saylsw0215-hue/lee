@@ -1,0 +1,7 @@
+{
+  "name": "HeroDefense.Editor",
+  "rootNamespace": "HeroDefense.Editor",
+  "references": ["HeroDefense.Runtime"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

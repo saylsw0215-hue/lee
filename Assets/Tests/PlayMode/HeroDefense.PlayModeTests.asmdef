@@ -1,0 +1,5 @@
+{
+  "name": "HeroDefense.PlayModeTests",
+  "references": ["HeroDefense.Runtime"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

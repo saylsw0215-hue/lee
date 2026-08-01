@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: upgrade_all_units
+  m_EditorClassIdentifier: HeroDefense.Runtime:HeroDefense.Progression:UpgradeData
+  upgradeId: upgrade_all_units
+  displayName: "\uBCA0\uD14C\uB791 \uBCD1\uB825"
+  description: "\uC77C\uBC18 \uC544\uAD70 \uACF5\uACA9\uB825 +10%"
+  heroId: 
+  category: 3
+  rarity: 2
+  maxLevel: 3
+  selectionWeight: 1
+  effects:
+  - kind: 0
+    value: 0.1
+  requirement:
+    battleLevel: 1
+    requiredUpgradeId: 
+    requiredUpgradeLevel: 0

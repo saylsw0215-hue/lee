@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce49f0bf7af24660bd4fc5b7cdcbc2a, type: 3}
+  m_Name: KnightGuardianOath
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Heroes.HeroSkillData
+  skillId: ultimate_knight_guardian_oath
+  displayName: "\uC218\uD638\uC790\uC758 \uB9F9\uC138"
+  description: "8\uCD08 \uD53C\uD574 \uAC10\uC18C\uC640 \uC8FC\uBCC0 \uCDA9\uACA9"
+  kind: 1
+  cooldown: 0
+  castTime: 0.35
+  range: 3
+  radius: 3
+  damageMultiplier: 1.2
+  duration: 8
+  maxTargets: 20
+  requiredEnergy: 100
+  targetingMode: 1
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.15, g: 0.7, b: 1, a: 1}

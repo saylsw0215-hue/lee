@@ -1,0 +1,21 @@
+using UnityEngine;
+
+namespace HeroDefense.Heroes
+{
+    public enum HeroArchetype{Knight,Ranger,FireMage,Engineer,Saint,Assassin}
+    public enum HeroState{Inactive,Spawning,Alive,CastingSkill,CastingUltimate,Dead,Respawning,Victory,Defeat}
+    public enum HeroVisualShape{Knight,Ranger,FireMage,Engineer,Saint,Assassin}
+
+    [CreateAssetMenu(fileName="HeroData",menuName="Hero Defense/Heroes/Hero Data")]
+    public sealed class HeroData:ScriptableObject
+    {
+        [SerializeField]private string heroId;[SerializeField]private string displayName;[SerializeField]private string roleName;[SerializeField]private string description;[SerializeField]private HeroArchetype archetype;
+        [SerializeField,Min(.01f)]private float maxHealth=100;[SerializeField,Min(0)]private float moveSpeed=2;[SerializeField,Min(0)]private float attackDamage=10;[SerializeField,Min(.1f)]private float attackRange=1;[SerializeField,Min(.05f)]private float attackInterval=1;[SerializeField,Min(0)]private float detectionRange=10;[SerializeField,Min(0)]private float respawnDuration=10;
+        [SerializeField]private HeroSkillData activeSkill;[SerializeField]private HeroSkillData ultimateSkill;[SerializeField]private HeroPassiveData passive;[SerializeField]private Sprite portrait;[SerializeField]private Sprite fullBodyImage;[SerializeField]private GameObject prefab;[SerializeField]private Color placeholderColor=Color.white;[SerializeField]private HeroVisualShape visualShape;[SerializeField]private HeroDefense.Battle.Combat.CombatStats advancedStats=new();
+        public string HeroId=>heroId;public string DisplayName=>displayName;public string RoleName=>roleName;public string Description=>description;public HeroArchetype Archetype=>archetype;public float MaxHealth=>maxHealth;public float MoveSpeed=>moveSpeed;public float AttackDamage=>attackDamage;public float AttackRange=>attackRange;public float AttackInterval=>attackInterval;public float DetectionRange=>detectionRange;public float RespawnDuration=>respawnDuration;public HeroSkillData ActiveSkill=>activeSkill;public HeroSkillData UltimateSkill=>ultimateSkill;public HeroPassiveData Passive=>passive;public Sprite Portrait=>portrait;public Sprite FullBodyImage=>fullBodyImage;public GameObject Prefab=>prefab;public Color PlaceholderColor=>placeholderColor;public HeroVisualShape VisualShape=>visualShape;public HeroDefense.Battle.Combat.CombatStats AdvancedStats=>advancedStats??=new HeroDefense.Battle.Combat.CombatStats();
+        public bool Validate(out string reason){if(string.IsNullOrWhiteSpace(heroId)||string.IsNullOrWhiteSpace(displayName)){reason="Hero ID and name are required.";return false;}if(maxHealth<=0||attackDamage<0||attackInterval<=0||respawnDuration<0){reason="Hero combat and respawn values are invalid.";return false;}if(activeSkill==null||ultimateSkill==null||passive==null||prefab==null){reason="Active, ultimate, passive, and placeholder prefab are required.";return false;}if(!activeSkill.Validate(out reason)||!ultimateSkill.Validate(out reason)||!passive.Validate(out reason)||!AdvancedStats.Validate(out reason))return false;reason=string.Empty;return true;}
+        public void Configure(string id,string name,string role,string details,HeroArchetype type,float health,float speed,float damage,float range,float interval,float detection,float respawn,HeroSkillData active,HeroSkillData ultimate,HeroPassiveData passiveData,Color color,HeroVisualShape shape){heroId=id;displayName=name;roleName=role;description=details;archetype=type;maxHealth=health;moveSpeed=speed;attackDamage=damage;attackRange=range;attackInterval=interval;detectionRange=detection;respawnDuration=respawn;activeSkill=active;ultimateSkill=ultimate;passive=passiveData;placeholderColor=color;visualShape=shape;}
+        public void SetVisualAssets(Sprite portraitSprite,Sprite fullBodySprite,GameObject placeholderPrefab){portrait=portraitSprite;fullBodyImage=fullBodySprite;prefab=placeholderPrefab;}
+        public void ConfigureAdvanced(float defense,float magicDefense,float criticalChance,float criticalDamage,float dodge,float accuracy,float flatPen,float percentPen,float ccResistance,float statusResistance,float maxShield=0)=>AdvancedStats.Configure(defense,magicDefense,criticalChance,criticalDamage,dodge,accuracy,flatPen,percentPen,ccResistance,statusResistance,maxShield);
+    }
+}

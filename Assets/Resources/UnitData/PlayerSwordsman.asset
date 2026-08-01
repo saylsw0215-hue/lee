@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83db9ed6ca9b94b068bb3d15247647fc, type: 3}
+  m_Name: PlayerSwordsman
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Battle.Combat.UnitData
+  unitId: player_swordsman
+  displayName: "\uAC80\uC0AC"
+  team: 0
+  maxHealth: 100
+  moveSpeed: 2
+  attackDamage: 20
+  attackRange: 1.1
+  attackInterval: 1
+  detectionRange: 8
+  collisionRadius: 0.42
+  rewardGold: 0
+  placeholderColor: {r: 0.12, g: 0.42, b: 0.88, a: 1}
+  visualShape: 0
+  advancedStats:
+    defense: 30
+    magicDefense: 10
+    criticalChance: 0.05
+    criticalDamageMultiplier: 1.5
+    dodgeChance: 0.02
+    accuracy: 0
+    armorPenetrationFlat: 0
+    armorPenetrationPercent: 0
+    crowdControlResistance: 0
+    statusEffectResistance: 0
+    maxShield: 0

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: upgrade_base_max_health
+  m_EditorClassIdentifier: HeroDefense.Runtime:HeroDefense.Progression:UpgradeData
+  upgradeId: upgrade_base_max_health
+  displayName: "\uC131\uBCBD \uBCF4\uAC15"
+  description: "\uBCF8\uC9C4 \uCD5C\uB300 \uCCB4\uB825 +25%"
+  heroId: 
+  category: 6
+  rarity: 0
+  maxLevel: 4
+  selectionWeight: 1
+  effects:
+  - kind: 12
+    value: 0.25
+  requirement:
+    battleLevel: 1
+    requiredUpgradeId: 
+    requiredUpgradeLevel: 0

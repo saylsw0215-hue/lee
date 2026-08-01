@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1478828b685a42febdac965e93757a5, type: 3}
+  m_Name: Wave02
+  m_EditorClassIdentifier: HeroDefense.Runtime::HeroDefense.Battle.Waves.WaveData
+  waveId: stage01_wave_02
+  displayName: Wave 2
+  preparationDuration: 7
+  completionDelay: 2
+  clearRewardGold: 35
+  eliteWave: 0
+  bossWave: 0
+  announcement: "\uC2AC\uB77C\uC784 \uBB34\uB9AC"
+  spawnGroups:
+  - enemyData: {fileID: 11400000, guid: a97cafb7f4cd14a58a579c3fd0c3e6cb, type: 2}
+    count: 8
+    initialDelay: 0
+    spawnInterval: 1
+    spawnPointIndex: 1

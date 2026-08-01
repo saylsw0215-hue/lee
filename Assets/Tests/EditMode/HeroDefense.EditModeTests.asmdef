@@ -1,0 +1,6 @@
+{
+  "name": "HeroDefense.EditModeTests",
+  "references": ["HeroDefense.Runtime", "HeroDefense.Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "includePlatforms": ["Editor"]
+}

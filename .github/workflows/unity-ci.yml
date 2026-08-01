@@ -1,0 +1,156 @@
+name: Hero Defense Unity CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      build_target:
+        description: Build target
+        required: true
+        default: webgl
+        type: choice
+        options: [webgl, macos, ios, all]
+
+concurrency:
+  group: hero-defense-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  UNITY_VERSION: 6000.5.6f1
+
+jobs:
+  tests:
+    name: EditMode and PlayMode tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ hashFiles('Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-${{ runner.os }}-
+      - name: Run Unity tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: all
+          artifactsPath: test-results
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unity-test-results
+          path: test-results
+
+  webgl:
+    name: WebGL and GitHub Pages
+    needs: tests
+    if: github.event_name != 'workflow_dispatch' || inputs.build_target == 'webgl' || inputs.build_target == 'all'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-WebGL-
+      - name: Build WebGL
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: WebGL
+          buildsPath: build
+          buildName: HeroDefense
+          versioning: None
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          index_file="$(find build -name index.html -print -quit)"
+          test -n "$index_file"
+          mkdir -p public
+          cp -R "$(dirname "$index_file")"/. public/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HeroDefense-WebGL
+          path: public
+
+  deploy-pages:
+    name: Deploy GitHub Pages
+    needs: webgl
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  macos:
+    name: macOS app artifact
+    needs: tests
+    if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'macos' || inputs.build_target == 'all')
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build macOS
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: StandaloneOSX
+          buildsPath: build
+          buildName: HeroDefense
+          versioning: None
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HeroDefense-macOS
+          path: build
+
+  ios:
+    name: iOS Xcode project artifact
+    needs: tests
+    if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'ios' || inputs.build_target == 'all')
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build iOS Xcode project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: iOS
+          buildsPath: build
+          buildName: HeroDefenseXcode
+          versioning: None
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HeroDefense-iOS-Xcode
+          path: build
+
