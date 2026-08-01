@@ -17,6 +17,8 @@ namespace HeroDefense.UI
             get
             {
                 if(cuteFont!=null)return cuteFont;
+                cuteFont=Resources.Load<Font>("Fonts/NotoSansKR");
+                if(cuteFont!=null)return cuteFont;
                 cuteFont=Font.CreateDynamicFontFromOSFont(new[]{"Arial Rounded MT Bold","Apple SD Gothic Neo","Arial"},32);
                 return cuteFont!=null?cuteFont:Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
