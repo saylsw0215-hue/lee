@@ -18,6 +18,7 @@ namespace HeroDefense.Editor
     {
         private const string BundleIdentifier = "com.independent.herodefense";
         private static readonly string[] RequiredScenes = { SceneNames.Boot, SceneNames.MainMenu, SceneNames.HeroSelect, SceneNames.StageSelect, SceneNames.Battle };
+        private static readonly string[] TransientTestRunnerAssets = { "Assets/Resources/PerformanceTestRunInfo.json", "Assets/Resources/PerformanceTestRunSettings.json" };
 
         [MenuItem("Tools/Hero Defense/Build/macOS App")]
         public static void BuildMacOS()
@@ -99,6 +100,7 @@ namespace HeroDefense.Editor
                 Phase6Setup.Setup();
                 Phase8Setup.Setup();
                 Phase9Setup.Setup();
+                RemoveTransientTestRunnerAssets();
                 configure?.Invoke();
                 Validate(target);
                 string output = Path.GetFullPath(relativeOutput);
@@ -118,6 +120,22 @@ namespace HeroDefense.Editor
                 Debug.LogError($"Hero Defense {artifactName} build failed: {exception.Message}\n{exception}");
                 if (Application.isBatchMode) EditorApplication.Exit(1); else throw;
             }
+        }
+
+        private static void RemoveTransientTestRunnerAssets()
+        {
+            // Performance Test Framework creates these exact temporary Resources assets after a test run.
+            // If left imported, its build hook includes test/NUnit assemblies in a normal Player and TypeDB reports duplicate types.
+            for (int i = 0; i < TransientTestRunnerAssets.Length; i++)
+            {
+                string assetPath = TransientTestRunnerAssets[i];
+                if (File.Exists(assetPath) || File.Exists(assetPath + ".meta"))
+                {
+                    AssetDatabase.DeleteAsset(assetPath);
+                }
+            }
+
+            AssetDatabase.Refresh();
         }
 
         private static void ConfigureMacOS()

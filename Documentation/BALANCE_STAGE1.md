@@ -2,6 +2,21 @@
 
 The opt-in `StageOneBalanceScenarioPlayModeTests` fixture drives the real Battle scene at 12× time scale. It installs Barracks and Archery Range immediately, buys Magic Tower when affordable, performs one Barracks upgrade, and uses each hero's active and ultimate skills. Results are written under `Builds/Balance` and are not committed.
 
+## Running the measurement
+
+Run it locally without adding the long scenario to ordinary PlayMode regression time:
+
+```bash
+UNITY_BIN="/Applications/Unity/Hub/Editor/6000.5.6f1/Unity.app/Contents/MacOS/Unity"
+"$UNITY_BIN" -batchmode -nographics -projectPath "$PWD" \
+  -runTests -testPlatform playmode -assemblyNames HeroDefense.PlayModeTests \
+  -testFilter HeroDefense.Tests.PlayMode.StageOneBalanceScenarioPlayModeTests \
+  -testResults "$PWD/Builds/Balance/balance-tests.xml" \
+  -logFile "$PWD/Builds/Logs/balance-tests.log"
+```
+
+On GitHub Actions, choose **Run workflow → balance**. JSON measurements, test XML, and the Unity log are uploaded as the `HeroDefense-Stage1-Balance-*` artifact. Each scenario has a timeout and reports NaN/Infinity, invalid health/gold/attack intervals, missing boss, stalled wave, missing terminal result, and continuously increasing active-object counts.
+
 ## Before adjustment
 
 Measured on Normal difficulty with the original 500 starting Gold and 116 enemies.

@@ -1,8 +1,8 @@
-# Hero Defense — Phase 6
+# Hero Defense — Runtime parity and gameplay stability
 
 > GitHub Actions, 브라우저용 GitHub Pages, macOS/iOS 아티팩트 설정은 [GITHUB_SETUP.md](GITHUB_SETUP.md)를 참고하세요.
 
-`Hero Defense`는 macOS에서 개발하고 iOS·Android 출시를 목표로 하는 가로형 전략 디펜스 프로토타입입니다. Phase 6는 영웅·건설·웨이브 시스템 위에 방어력, 치명타, 회피, 보호막, 통합 상태이상과 수동 스킬 조준을 추가합니다. 외부 에셋 없이 Unity 기본 UI 도형과 텍스트만 사용합니다.
+`Hero Defense`는 macOS에서 개발하고 WebGL·iOS·Android를 목표로 하는 가로형 전략 디펜스 프로젝트입니다. Editor와 Player는 동일한 Runtime Catalog를 사용하며, 자동 밸런스 측정·전투 피드백·안전한 오디오 이벤트·장시간 수명주기 회귀 검증을 포함합니다.
 
 ## 권장 환경과 프로젝트 열기
 
@@ -224,6 +224,11 @@ Simulator 지원 여부는 설치된 Unity 6 LTS 패치와 iOS Build Support에 
 ## 테스트
 
 `Window > General > Test Runner`에서 EditMode와 PlayMode 각각 **Run All**을 실행합니다. Phase 6 EditMode는 피해 공식, 관통, 치명타, 회피, 보호막, 모든 상태 규칙, 조준 보정과 통계를 검증합니다. PlayMode는 실제 Battle 씬에서 방어력, 기사 제어기·보호막, 레인저/마법사 수동 조준, 침묵, 일시정지, 신규 적과 초기화를 검증합니다. 결과는 `Builds/Logs/phase6-editmode.xml`과 `phase6-playmode.xml`에 저장됩니다.
+
+- 런타임 데이터 기준: [Documentation/RUNTIME_CATALOG.md](Documentation/RUNTIME_CATALOG.md)
+- Stage 1 측정과 변경 전후 결과: [Documentation/BALANCE_STAGE1.md](Documentation/BALANCE_STAGE1.md)
+- 오디오 클립 연결 방법: [Documentation/AUDIO_INTEGRATION.md](Documentation/AUDIO_INTEGRATION.md)
+- 자동/수동 QA 구분: [Documentation/QA_CHECKLIST.md](Documentation/QA_CHECKLIST.md)
 
 ## 주요 스크립트
 
