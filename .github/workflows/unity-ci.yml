@@ -11,7 +11,7 @@ on:
         required: true
         default: webgl
         type: choice
-        options: [webgl, macos, ios, all]
+        options: [webgl, macos, ios, balance, all]
 
 concurrency:
   group: hero-defense-${{ github.ref }}
@@ -67,7 +67,7 @@ jobs:
         run: |
           mkdir -p test-results
           "$UNITY_BIN" -batchmode -nographics -projectPath "$GITHUB_WORKSPACE" \
-            -runTests -testPlatform playmode -assemblyNames HeroDefense.PlayModeTests \
+            -runTests -testPlatform playmode -assemblyNames HeroDefense.PlayModeTests -testCategory "!Balance" \
             -testResults "$GITHUB_WORKSPACE/test-results/playmode.xml" \
             -logFile "$GITHUB_WORKSPACE/test-results/playmode.log"
       - name: Upload Unity test results and logs
@@ -135,6 +135,35 @@ jobs:
         with:
           name: HeroDefense-WebGL-${{ github.run_id }}
           path: public
+
+  balance:
+    name: Stage 1 balance telemetry
+    needs: tests
+    if: github.event_name == 'workflow_dispatch' && (inputs.build_target == 'balance' || inputs.build_target == 'all')
+    runs-on: [self-hosted, macOS, ARM64, hero-defense, unity-6000.5.6f1]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+      - name: Run opt-in Stage 1 scenarios
+        shell: bash
+        run: |
+          mkdir -p Builds/Balance Builds/Logs
+          "$UNITY_BIN" -batchmode -nographics -projectPath "$GITHUB_WORKSPACE" \
+            -runTests -testPlatform playmode -assemblyNames HeroDefense.PlayModeTests \
+            -testFilter HeroDefense.Tests.PlayMode.StageOneBalanceScenarioPlayModeTests \
+            -testResults "$GITHUB_WORKSPACE/Builds/Balance/balance-tests.xml" \
+            -logFile "$GITHUB_WORKSPACE/Builds/Logs/balance-tests.log"
+      - name: Upload balance telemetry and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HeroDefense-Stage1-Balance-${{ github.run_id }}
+          path: |
+            Builds/Balance
+            Builds/Logs/balance-tests.log
+          if-no-files-found: error
 
   deploy-pages:
     name: Deploy GitHub Pages

@@ -20,6 +20,8 @@ namespace HeroDefense.Battle
         public event Action<bool> DefeatStateChanged;
         public event Action<CombatUnit,DamageInfo> UnitDied;
         public event Action<UnitData> PlayerUnitProduced;
+        public event Action<CombatUnit> UnitSpawned;
+        public event Action<CombatUnit,DamageInfo,DamageResult> UnitDamageResolved;
         public int ActivePlayerCount=>registry.PlayerCount;
         public int ActiveEnemyCount=>registry.EnemyCount;
         public bool IsDefeated{get;private set;}
@@ -97,41 +99,44 @@ namespace HeroDefense.Battle
             float rowOffset = (lane / 7) * 28f;
             Vector2 origin = player ? playerSpawn.transform.localPosition : enemySpawn.transform.localPosition;
             CombatUnit unit = pool.Spawn(data, new Vector2(origin.x + (player ? -rowOffset : rowOffset), y), player ? 630 : -620);
-            unit.Died += OnUnitDied; status.text = $"{data.DisplayName} 소환";
+            Track(unit); status.text = $"{data.DisplayName} 소환";
         }
         public bool TrySpawnProduced(UnitData data,Vector2 sourcePosition)
         {
             if(data==null||data.Team!=Team.Player||pause.IsPaused||IsDefeated||registry.PlayerCount>=MaxProducedPlayers)return false;
             float offset=(playerLane++%5)*18f;CombatUnit unit=pool.Spawn(data,new Vector2(sourcePosition.x+offset,sourcePosition.y-(offset*.3f)),630);
-            unit.Died+=OnUnitDied;CollectionService.Record(data.UnitId,CollectionEvent.Used);PlayerUnitProduced?.Invoke(data);return true;
+            Track(unit);CollectionService.Record(data.UnitId,CollectionEvent.Used);PlayerUnitProduced?.Invoke(data);return true;
         }
         public bool TrySpawnWaveEnemy(UnitData data,int spawnPointIndex,out CombatUnit unit)
         {
             unit=null;if(data==null||data.Team!=Team.Enemy||pause.IsPaused||IsStageEnded||registry.EnemyCount>=35)return false;
             BattleSpawnPoint point=spawnPointIndex==1?enemySpawnSecond:enemySpawn;float offset=(enemyLane++%5)*22f;
-            unit=pool.Spawn(data,new Vector2(point.transform.localPosition.x+offset,point.transform.localPosition.y-(offset*.5f)),-620);unit.Died+=OnUnitDied;CollectionService.Record(data.UnitId,CollectionEvent.Encountered);return true;
+            unit=pool.Spawn(data,new Vector2(point.transform.localPosition.x+offset,point.transform.localPosition.y-(offset*.5f)),-620);Track(unit);CollectionService.Record(data.UnitId,CollectionEvent.Encountered);return true;
         }
         public void DamageBaseForDebug(float amount)=>playerBase.TakeDamage(new DamageInfo(amount,Team.Enemy));
         public void ForceReturnEnemies()
         {
-            var active=pool.Active;for(int i=active.Count-1;i>=0;i--){CombatUnit unit=active[i];if(unit.Team!=Team.Enemy)continue;unit.Died-=OnUnitDied;unit.ReturnWithoutReward();pool.Return(unit);}
+            var active=pool.Active;for(int i=active.Count-1;i>=0;i--){CombatUnit unit=active[i];if(unit.Team!=Team.Enemy)continue;Untrack(unit);unit.ReturnWithoutReward();pool.Return(unit);}
         }
         private void OnUnitDied(CombatUnit unit, DamageInfo killingBlow)
         {
-            unit.Died -= OnUnitDied;
+            Untrack(unit);
             if (unit.Team == Team.Enemy && killingBlow.SourceTeam == Team.Player){state.AddGold(Mathf.RoundToInt(unit.Data.RewardGold*(HeroDefense.Progression.BattleModifierRepository.Current?.KillGoldMultiplier??1f)*DifficultyModifiers.For(BattleLaunchConfig.Difficulty).Gold*MetaRuntimeModifierProvider.KillGoldMultiplier));CollectionService.Record(unit.Data.UnitId,CollectionEvent.Defeated);}
             UnitDied?.Invoke(unit,killingBlow);
         }
         public void ResetBattle()
         {
             pause.Resume(); defeatPanel.SetActive(false);IsDefeated=false;IsVictorious=false;DefeatStateChanged?.Invoke(false);
-            var active = pool.Active; for (int i = active.Count - 1; i >= 0; i--) active[i].Died -= OnUnitDied;
+            var active = pool.Active; for (int i = active.Count - 1; i >= 0; i--) Untrack(active[i]);
             pool.ReturnAll(); state.Reset(); playerBase.ResetBase(); buildingSelection.Clear(); playerLane = enemyLane = 0; status.text = "전투 초기화 완료";BattleReset?.Invoke();
         }
         public void MarkStageCleared(){if(IsStageEnded)return;IsVictorious=true;DefeatStateChanged?.Invoke(false);pause.SuspendForResult();}
         public void SetDefeatDetails(string details){if(defeatTitle!=null)defeatTitle.text="스테이지 실패\n"+details;}
         private void ShowDefeat() { if (defeatPanel.activeSelf||IsVictorious) return;IsDefeated=true;DefeatStateChanged?.Invoke(true); pause.SuspendForResult(); defeatPanel.SetActive(true); }
         public void Dispose() { playerBase.Defeated -= ShowDefeat; }
+        private void Track(CombatUnit unit){unit.Died-=OnUnitDied;unit.Died+=OnUnitDied;unit.DamageResolved-=OnUnitDamageResolved;unit.DamageResolved+=OnUnitDamageResolved;UnitSpawned?.Invoke(unit);}
+        private void Untrack(CombatUnit unit){if(unit==null)return;unit.Died-=OnUnitDied;unit.DamageResolved-=OnUnitDamageResolved;}
+        private void OnUnitDamageResolved(CombatUnit target,DamageInfo info,DamageResult result)=>UnitDamageResolved?.Invoke(target,info,result);
         private static UnitData Load(string name)
         {
             return RuntimeUnitCatalog.Get(name);
